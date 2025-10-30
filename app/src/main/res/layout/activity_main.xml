@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".MainActivity">
+
+
+    <EditText
+        android:id="@+id/eTMail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Mail"
+        android:text="testMail@makif.com"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/eTPass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Password"
+        android:text="secret123"
+        android:inputType="textPassword" />
+
+    <CheckBox
+        android:id="@+id/stayConnected"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Stay connected" />
+
+    <Button
+        android:id="@+id/btnLoginUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login" />
+
+    <Button
+        android:id="@+id/btnCreateUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sign up" />
+
+    <TextView
+        android:id="@+id/tVMsg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="result" />
+</LinearLayout>
