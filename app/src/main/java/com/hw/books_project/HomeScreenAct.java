@@ -6,14 +6,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 public class HomeScreenAct extends AppCompatActivity {
 
     private Button btnLogout;
     private Intent intent;
-
+    private BottomNavigationView bottomNavigationView;
+    Fragment books, libraries;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +30,26 @@ public class HomeScreenAct extends AppCompatActivity {
         btnLogout = findViewById(R.id.btnLogout);
         intent = new Intent(HomeScreenAct.this, MainActivity.class);
         btnLogout.setOnClickListener(this::logout);
+        bottomNavigationView = findViewById(R.id.bottom_nev_bar);
+
+        books = new BooksFragment();
+        libraries = new LibrariesFragment();
+
+        setCurrentFragment(libraries);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.books) {
+                setCurrentFragment(books);
+            } else if (itemId == R.id.libraries) {
+                setCurrentFragment(libraries);
+            }
+            return true;
+        });
+
+
+    }
+    private void setCurrentFragment(Fragment fragment){
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
     }
 
     public void logout(View view) {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/libraries"
+        android:title="Libraries"
+        android:icon="@drawable/baseline_local_library_24"/>
+    <item
+        android:id="@+id/books"
+        android:title="Books"
+        android:icon="@drawable/library_book"/>
+</menu>
