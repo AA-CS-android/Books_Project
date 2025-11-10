@@ -9,7 +9,7 @@ import android.widget.Button;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class HomeScreen extends AppCompatActivity {
+public class HomeScreenAct extends AppCompatActivity {
 
     private Button btnLogout;
     private Intent intent;
@@ -24,7 +24,7 @@ public class HomeScreen extends AppCompatActivity {
 
     private void init() {
         btnLogout = findViewById(R.id.btnLogout);
-        intent = new Intent(HomeScreen.this, MainActivity.class);
+        intent = new Intent(HomeScreenAct.this, MainActivity.class);
         btnLogout.setOnClickListener(this::logout);
     }
 

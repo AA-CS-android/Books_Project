@@ -12,13 +12,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseNetworkException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
@@ -49,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         boolean isChecked = sharedPref.getBoolean("stayConnected", false);
-        si = new Intent(MainActivity.this, HomeScreen.class);
+        si = new Intent(MainActivity.this, HomeScreenAct.class);
         FirebaseUser fbuser = FBRef.refAuth.getCurrentUser();
         if (fbuser != null && isChecked) {
             user = fbuser;
