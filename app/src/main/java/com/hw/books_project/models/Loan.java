@@ -1,4 +1,4 @@
-package com.hw.books_project;
+package com.hw.books_project.models;
 
 import java.util.Date;
 
