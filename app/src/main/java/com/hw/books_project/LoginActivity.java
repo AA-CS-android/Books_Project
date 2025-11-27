@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                             editor.putBoolean("rememberMe", binding.rememberMe.isChecked());
                             editor.apply();
 
-                            Log.i("MainActivity", "signInUserWithEmailAndPassword: success");
+                            Log.i("LoginActivity", "signInUserWithEmailAndPassword: success");
                             Intent intent = new Intent(LoginActivity.this, HomeScreenAct.class);
                             startActivity(intent);
                             finish();

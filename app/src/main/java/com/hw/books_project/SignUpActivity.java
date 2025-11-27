@@ -56,18 +56,18 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     pd.dismiss();
                     if (task.isSuccessful()) {
-                        //TODO: make sure that the user is created correctly
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
                             // Save user to Realtime Database
-                            User user = new User(firstName + " " + lastName, email);
+                            User user = new User(firstName + " " + lastName, email, firebaseUser.getUid());
+
                             FBRef.refUsers.child(firebaseUser.getUid()).setValue(user);
 
                             SharedPreferences.Editor editor = sharedPref.edit();
                             editor.putBoolean("rememberMe", binding.rememberMe.isChecked());
                             editor.apply();
 
-                            Log.i("MainActivity", "createUserWithEmailAndPassword: success");
+                            Log.i("SignUpActivity", "createUserWithEmailAndPassword: success");
                             Intent intent = new Intent(SignUpActivity.this, HomeScreenAct.class);
                             startActivity(intent);
                             finish();

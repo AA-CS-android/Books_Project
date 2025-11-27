@@ -1,8 +1,13 @@
 package com.hw.books_project.models;
 
+import android.view.inputmethod.SelectGesture;
+
+import androidx.annotation.Nullable;
+
 import java.util.List;
 
 public class User {
+    private String uid;
     private String name;
     private String email;
     private String phone;
@@ -10,6 +15,8 @@ public class User {
     private List<Book> books_holding;
     private List<Book> books_want_to_read;
 
+    public User() {
+    }
     public User(String name, String email) {
         this.name = name;
         this.email = email;
@@ -17,6 +24,25 @@ public class User {
         this.books_read = null;
         this.books_holding = null;
         this.books_want_to_read = null;
+        this.uid = null;
+    }
+
+    public User(String name, String email, String uid) {
+        this.uid = uid;
+        this.name = name;
+        this.email = email;
+        this.phone = null;
+        this.books_read = null;
+        this.books_holding = null;
+        this.books_want_to_read = null;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getName() {

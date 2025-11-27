@@ -28,7 +28,7 @@ public class HomeScreenAct extends AppCompatActivity {
 
     private void init() {
         btnLogout = findViewById(R.id.btnLogout);
-        intent = new Intent(HomeScreenAct.this, MainActivity.class);
+        intent = new Intent(HomeScreenAct.this, AuthActivity.class );
         btnLogout.setOnClickListener(this::logout);
         bottomNavigationView = findViewById(R.id.bottom_nev_bar);
 
