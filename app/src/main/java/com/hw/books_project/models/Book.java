@@ -5,10 +5,10 @@ import java.util.List;
 public class Book
 {
     private String name;
-    private List<String> ganers;
-    private String auother;
+    private List<String> genres;
+    private String author;
     private String publisher;
-    private String realese_date;
+    private String release_date;
     private String language;
 
     /*
@@ -19,21 +19,20 @@ public class Book
 
 //    private String googleBooksID;
 //    private String selfLink;
-//    private String ISBN;
-//    private String danacode;
+    private String ISBN;
+    private String danacode;
 
-
-    public Book() {
-    }
-
-    public Book(String name, List<String> ganers, String auother, String publisher, String realese_date, String language, String status) {
+    
+    public Book(String name, List<String> genres, String author, String publisher, String release_date, String language, String status, String ISBN, String danacode) {
         this.name = name;
-        this.ganers = ganers;
-        this.auother = auother;
+        this.genres = genres;
+        this.author = author;
         this.publisher = publisher;
-        this.realese_date = realese_date;
+        this.release_date = release_date;
         this.language = language;
         this.status = status;
+        this.ISBN = ISBN;
+        this.danacode = danacode;
     }
 
     public String getName() {
@@ -44,20 +43,20 @@ public class Book
         this.name = name;
     }
 
-    public List<String> getGaners() {
-        return ganers;
+    public List<String> getGenres() {
+        return genres;
     }
 
-    public void setGaners(List<String> ganers) {
-        this.ganers = ganers;
+    public void setGenres(List<String> genres) {
+        this.genres = genres;
     }
 
-    public String getAuother() {
-        return auother;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setAuother(String auother) {
-        this.auother = auother;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getPublisher() {
@@ -68,12 +67,12 @@ public class Book
         this.publisher = publisher;
     }
 
-    public String getRealese_date() {
-        return realese_date;
+    public String getRelease_date() {
+        return release_date;
     }
 
-    public void setRealese_date(String realese_date) {
-        this.realese_date = realese_date;
+    public void setRelease_date(String release_date) {
+        this.release_date = release_date;
     }
 
     public String getLanguage() {
@@ -92,4 +91,19 @@ public class Book
         this.status = status;
     }
 
+    public String getISBN() {
+        return ISBN;
+    }
+
+    public void setISBN(String ISBN) {
+        this.ISBN = ISBN;
+    }
+
+    public String getDanacode() {
+        return danacode;
+    }
+
+    public void setDanacode(String danacode) {
+        this.danacode = danacode;
+    }
 }
