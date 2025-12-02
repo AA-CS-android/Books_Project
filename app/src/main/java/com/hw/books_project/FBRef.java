@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.hw.books_project.models.User;
 
 public class FBRef {
     public static FirebaseAuth refAuth = FirebaseAuth.getInstance();
@@ -17,6 +18,8 @@ public class FBRef {
 
     public static DatabaseReference refBooks=refDB.getReference("Books");
     public static DatabaseReference refUsers=refDB.getReference("Users");
+
+    public static User currentUser;
 
     public static String firebaseAuthError(Exception exp) {
         String message;
