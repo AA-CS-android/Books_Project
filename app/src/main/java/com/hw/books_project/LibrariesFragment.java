@@ -1,66 +1,81 @@
 package com.hw.books_project;
 
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link LibrariesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.hw.books_project.databinding.FragmentLibariesBinding;
+import com.google.android.material.search.SearchBar;
+import com.google.android.material.search.SearchView;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class LibrariesFragment extends Fragment {
-//
-//    // TODO: Rename parameter arguments, choose names that match
-//    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
-//
-//    // TODO: Rename and change types of parameters
-//    private String mParam1;
-//    private String mParam2;
-//
-//    public LibrariesFragment() {
-//        // Required empty public constructor
-//    }
-//
-//    /**
-//     * Use this factory method to create a new instance of
-//     * this fragment using the provided parameters.
-//     *
-//     * @param param1 Parameter 1.
-//     * @param param2 Parameter 2.
-//     * @return A new instance of fragment LibrariesFragment.
-//     */
-//    // TODO: Rename and change types and number of parameters
-//    public static LibrariesFragment newInstance(String param1, String param2) {
-//        LibrariesFragment fragment = new LibrariesFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-//
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
-//    }
 
-    @Nullable
+    private FragmentLibariesBinding binding;
+    private ArrayAdapter<String> adapter;
+    private final List<String> demoList = Arrays.asList("Library 1", "Library 2", "Library 3", "Library 4", "Library 5");
+    private final List<String> filteredList = new ArrayList<>();
+
+    public LibrariesFragment() {
+        // Required empty public constructor
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_libaries, container, false);
+        // Inflate the layout for this fragment using View Binding
+        binding = FragmentLibariesBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        init();
+    }
+
+    private void init() {
+        // Initialize UI components and Listeners here
+
+        filteredList.addAll(demoList);
+        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1,filteredList);
+
+        // Logic for Creating a Library
+        binding.createLibBtn.setOnClickListener(v -> {
+            // TODO: Add your logic to open a dialog or activity to create a library
+            Toast.makeText(requireContext(), "Create Library Button Clicked", Toast.LENGTH_SHORT).show();
+        });
+
+        // Logic for Search
+        binding.libSearchBar.setOnClickListener(v -> {
+            binding.searchView.show();
+        });
+
+        binding.searchView.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+            binding.libSearchBar.setText(binding.searchView.getText().toString());
+            Toast.makeText(requireContext(), "Search: " + binding.searchView.getText().toString(), Toast.LENGTH_SHORT).show();
+            binding.searchView.hide();
+            return false;
+        });
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Clear binding reference to prevent memory leaks
+        binding = null;
     }
 }
