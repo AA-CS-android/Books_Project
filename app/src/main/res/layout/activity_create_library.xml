@@ -15,140 +15,487 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"
             android:text="Create New Library"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"/>
+            android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Library Name"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="16dp"
+            android:hint="Library Name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etLibName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"/>
+                android:inputType="textCapWords" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Opening Days"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginBottom="8dp"
+            android:text="Opening Hours"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-        <GridLayout
+        <!-- Sunday -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="4"
-            android:id="@+id/daysGrid">
-            
-            <CheckBox android:id="@+id/cbSun" android:text="Sun" />
-            <CheckBox android:id="@+id/cbMon" android:text="Mon" />
-            <CheckBox android:id="@+id/cbTue" android:text="Tue" />
-            <CheckBox android:id="@+id/cbWed" android:text="Wed" />
-            <CheckBox android:id="@+id/cbThu" android:text="Thu" />
-            <CheckBox android:id="@+id/cbFri" android:text="Fri" />
-            <CheckBox android:id="@+id/cbSat" android:text="Sat" />
-        </GridLayout>
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
+            <CheckBox
+                android:id="@+id/cbSun"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Sunday" />
+
+            <Button
+                android:id="@+id/btnOpenSun"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08:00"
+                android:enabled="false"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="-" />
+
+            <Button
+                android:id="@+id/btnCloseSun"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="16:00"
+                android:enabled="false"/>
+        </LinearLayout>
+
+        <!-- Monday -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cbMon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Monday" />
+
+            <Button
+                android:id="@+id/btnOpenMon"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08:00"
+                android:enabled="false"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="-" />
+
+            <Button
+                android:id="@+id/btnCloseMon"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="16:00"
+                android:enabled="false"/>
+        </LinearLayout>
+
+        <!-- Tuesday -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cbTue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tuesday" />
+
+            <Button
+                android:id="@+id/btnOpenTue"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08:00"
+                android:enabled="false"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="-" />
+
+            <Button
+                android:id="@+id/btnCloseTue"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="16:00"
+                android:enabled="false"/>
+        </LinearLayout>
+
+        <!-- Wednesday -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cbWed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Wednesday" />
+
+            <Button
+                android:id="@+id/btnOpenWed"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08:00"
+                android:enabled="false"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="-" />
+
+            <Button
+                android:id="@+id/btnCloseWed"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="16:00"
+                android:enabled="false"/>
+        </LinearLayout>
+
+        <!-- Thursday -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cbThu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Thursday" />
+
+            <Button
+                android:id="@+id/btnOpenThu"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08:00"
+                android:enabled="false"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="-" />
+
+            <Button
+                android:id="@+id/btnCloseThu"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="16:00"
+                android:enabled="false"/>
+        </LinearLayout>
+
+        <!-- Friday -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cbFri"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Friday" />
+
+            <Button
+                android:id="@+id/btnOpenFri"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08:00"
+                android:enabled="false"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="-" />
+
+            <Button
+                android:id="@+id/btnCloseFri"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="16:00"
+                android:enabled="false"/>
+        </LinearLayout>
+
+        <!-- Saturday -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cbSat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Saturday" />
+
+            <Button
+                android:id="@+id/btnOpenSat"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08:00"
+                android:enabled="false"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="-" />
+
+            <Button
+                android:id="@+id/btnCloseSat"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="16:00"
+                android:enabled="false"/>
+        </LinearLayout>
+
+
+        <!-- LOAN RULES -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Opening Hours"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:text="Loan Rules"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Max Loan Duration -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Max Loan Duration (Days)" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputLayout
+            <Button
+                android:id="@+id/btnDurMin5"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="-5" />
+
+            <Button
+                android:id="@+id/btnDurMin1"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="-1" />
+
+            <EditText
+                android:id="@+id/etMaxDuration"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Open (HH:MM)"
-                android:layout_marginEnd="8dp">
+                android:gravity="center"
+                android:inputType="number"
+                android:text="14" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etOpenTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="datetime|time"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
+            <Button
+                android:id="@+id/btnDurPls1"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Close (HH:MM)"
-                android:layout_marginStart="8dp">
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="+1" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etCloseTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="datetime|time"/>
-            </com.google.android.material.textfield.TextInputLayout>
+            <Button
+                android:id="@+id/btnDurPls5"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="+5" />
         </LinearLayout>
 
+        <!-- Max Loan Count -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Loan Rules"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="4dp"/>
+            android:layout_marginTop="8dp"
+            android:text="Max Loan Count (Books)" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Max Loan Duration (Days)"
-            android:layout_marginBottom="8dp">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etMaxDuration"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/btnCountMin5"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="number"/>
-        </com.google.android.material.textfield.TextInputLayout>
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="-5" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Max Loan Count (Books)"
-            android:layout_marginBottom="8dp">
+            <Button
+                android:id="@+id/btnCountMin1"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="-1" />
 
-            <com.google.android.material.textfield.TextInputEditText
+            <EditText
                 android:id="@+id/etMaxCount"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:inputType="number"/>
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_weight="1"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="3" />
 
-        <com.google.android.material.textfield.TextInputLayout
+            <Button
+                android:id="@+id/btnCountPls1"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="+1" />
+
+            <Button
+                android:id="@+id/btnCountPls5"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="+5" />
+        </LinearLayout>
+
+
+        <!-- Reloan Cooldown -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Reloan Cooldown (Days)" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Reloan Cooldown (Days)"
-            android:layout_marginBottom="16dp">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etCooldown"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/btnCoolMin5"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="number"/>
-        </com.google.android.material.textfield.TextInputLayout>
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="-5" />
+
+            <Button
+                android:id="@+id/btnCoolMin1"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="-1" />
+
+            <EditText
+                android:id="@+id/etCooldown"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="7" />
+
+            <Button
+                android:id="@+id/btnCoolPls1"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="+1" />
+
+            <Button
+                android:id="@+id/btnCoolPls5"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="+5" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/btnCreateLibrary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Create Library"
-            android:padding="12dp"/>
+            android:layout_marginTop="24dp"
+            android:padding="12dp"
+            android:text="Create Library" />
 
     </LinearLayout>
 </ScrollView>

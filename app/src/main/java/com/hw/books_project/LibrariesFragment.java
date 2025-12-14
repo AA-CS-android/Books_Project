@@ -1,5 +1,6 @@
 package com.hw.books_project;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -57,6 +58,9 @@ public class LibrariesFragment extends Fragment {
 
         binding.createLibBtn.setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Create Library Button Clicked", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(requireContext(), CreateLibraryActivity.class);
+            startActivity(intent);
+            //TODO: maybe later change to registerForActivityResult and switch to the new library
         });
 
         binding.libSearchBar.setOnClickListener(v -> binding.searchView.show());
