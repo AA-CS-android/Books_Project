@@ -7,13 +7,12 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.textfield.TextInputEditText;
-
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
+import com.hw.books_project.models.Library;
 
 public class CreateLibraryActivity extends AppCompatActivity {
 
@@ -38,6 +37,9 @@ public class CreateLibraryActivity extends AppCompatActivity {
     private Button btnCountMin5, btnCountMin1, btnCountPls1, btnCountPls5;
     private Button btnCoolMin5, btnCoolMin1, btnCoolPls1, btnCoolPls5;
 
+    // Tmp lib
+    private Library lib;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +48,7 @@ public class CreateLibraryActivity extends AppCompatActivity {
     }
 
     private void init() {
+        lib = new Library();
         etLibName = findViewById(R.id.etLibName);
         etMaxDuration = findViewById(R.id.etMaxDuration);
         etMaxCount = findViewById(R.id.etMaxCount);
@@ -94,14 +97,15 @@ public class CreateLibraryActivity extends AppCompatActivity {
         int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
         int minute = mcurrentTime.get(Calendar.MINUTE);
         TimePickerDialog mTimePicker;
-        mTimePicker = new TimePickerDialog(CreateLibraryActivity.this, (timePicker, selectedHour, selectedMinute) -> 
+        mTimePicker = new TimePickerDialog(CreateLibraryActivity.this, (timePicker, selectedHour, selectedMinute) ->
                 btn.setText(String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute)), hour, minute, true);
+                //getting warnings when removing "Locale.getDefault()" so left it there
         mTimePicker.setTitle("Select Time");
         mTimePicker.show();
     }
 
     private void initIncDecButtons() {
-        // Duration
+        // Loan duration
         btnDurMin5 = findViewById(R.id.btnDurMin5);
         btnDurMin1 = findViewById(R.id.btnDurMin1);
         btnDurPls1 = findViewById(R.id.btnDurPls1);
@@ -111,7 +115,7 @@ public class CreateLibraryActivity extends AppCompatActivity {
         setupIncDecListeners(etMaxDuration, btnDurPls1, 1);
         setupIncDecListeners(etMaxDuration, btnDurPls5, 5);
 
-        // Count
+        // Books count
         btnCountMin5 = findViewById(R.id.btnCountMin5);
         btnCountMin1 = findViewById(R.id.btnCountMin1);
         btnCountPls1 = findViewById(R.id.btnCountPls1);
@@ -121,7 +125,7 @@ public class CreateLibraryActivity extends AppCompatActivity {
         setupIncDecListeners(etMaxCount, btnCountPls1, 1);
         setupIncDecListeners(etMaxCount, btnCountPls5, 5);
 
-        // Cooldown
+        // Loan cooldown
         btnCoolMin5 = findViewById(R.id.btnCoolMin5);
         btnCoolMin1 = findViewById(R.id.btnCoolMin1);
         btnCoolPls1 = findViewById(R.id.btnCoolPls1);
@@ -144,16 +148,33 @@ public class CreateLibraryActivity extends AppCompatActivity {
             }
         });
     }
-
+    private List<String> getOpeningDaysTimes() {
+        List<String> times = null;
+        //TODO: get the time and date that the library is open for each day
+        return times;
+    }
     private void createLibrary() {
+        boolean success = false;
         String name = etLibName.getText().toString();
+        List<String> openingDaysTimes = getOpeningDaysTimes();
+        int maxDuration = Integer.parseInt(etMaxDuration.getText().toString());
+        int maxCount = Integer.parseInt(etMaxCount.getText().toString());
+        int cooldown = Integer.parseInt(etCooldown.getText().toString());
+        //region ERROR_HANDLING
         if (name.isEmpty()) {
             Toast.makeText(this, "Please enter a library name", Toast.LENGTH_SHORT).show();
-            return;
         }
-
-        // TODO: Collect all data and create Library object
-        Toast.makeText(this, "Library Created (Logic TBD)", Toast.LENGTH_SHORT).show();
-        finish();
+        /// TODO: check remote database, if library name already in use then prompt user to change name
+        /// TODO: make sure closing time can't be before opening time
+        /// TODO: make sure that the users can't loan books for more then a year
+        //endregion
+        //region CREATE_LIBRARY
+        /// TODO: create library, maybe change it so that instead of creating a new lib, just update the lib we created when initializing the class
+        //endregion
+        /// TODO: try and create a new library on remote database
+        if (success)
+            finish();
+        else
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
     }
 }
