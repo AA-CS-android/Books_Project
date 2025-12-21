@@ -1,64 +1,46 @@
 package com.hw.books_project.models;
 
-import android.util.TimeUtils;
-
-import java.sql.Time;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class Library {
+    private String uid;
     private String name;
     private int maxLoanDuration;
     private int maxLoanCount;
     private int reloanCooldown;
-    //weekly opening hours
     private List<String> openingDaysTimes;
 
-    private List<Book> books;
-    private List<User> users;
-    private List<User> admins;
-    private List<Loan> loans;
-
-    final private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("u:HH:mm", Locale.getDefault());
+    // These lists can be populated later
+    private List<String> books; // Storing book UIDs
+    private List<String> users; // Storing user UIDs
+    private List<String> admins; // Storing user UIDs
+    private List<String> loans; // Storing loan UIDs
 
     public Library() {
-        this.name = "NAME_LESS";
-        this.maxLoanDuration = -1;
-        this.maxLoanCount = -1;
-        this.reloanCooldown = -1;
-        this.openingDaysTimes = null;
-        this.books = null;
-        this.users = null;
-        this.admins = null;
+        // Default constructor required for calls to DataSnapshot.getValue(Library.class)
     }
 
-    public Library(String name, int maxLoanDuration, int maxLoanCount, int reloanCooldown, List<String> openingDaysTimes, List<Book> books, List<User> users, List<User> admins, List<Loan> loans) {
-        this.name = name;
-        this.maxLoanDuration = maxLoanDuration;
-        this.maxLoanCount = maxLoanCount;
-        this.reloanCooldown = reloanCooldown;
-        this.openingDaysTimes = openingDaysTimes;
-        this.books = books;
-        this.users = users;
-        this.admins = admins;
-        this.loans = loans;
-    }
+    // --- Getters ---
+    public String getUid() { return uid; }
+    public String getName() { return name; }
+    public int getMaxLoanDuration() { return maxLoanDuration; }
+    public int getMaxLoanCount() { return maxLoanCount; }
+    public int getReloanCooldown() { return reloanCooldown; }
+    public List<String> getOpeningDaysTimes() { return openingDaysTimes; }
+    public List<String> getBooks() { return books; }
+    public List<String> getUsers() { return users; }
+    public List<String> getAdmins() { return admins; }
+    public List<String> getLoans() { return loans; }
 
-    /// @param timeString format: uhhmm where u is day of week
-    public LocalDate openingTimeParse(String timeString)
-    {
-        return LocalDate.parse(timeString, formatter);
-    }
-    public String openingTimeFormat(int day, int hour, int minute)
-    {
-        return String.valueOf(day) + ":" + String.valueOf(hour) + ":" + String.valueOf(minute);
-    }
-    public String openingTimeFormat(LocalDate time)
-    {
-        return formatter.format(time);
-    }
+    // --- Setters ---
+    public void setUid(String uid) { this.uid = uid; }
+    public void setName(String name) { this.name = name; }
+    public void setMaxLoanDuration(int maxLoanDuration) { this.maxLoanDuration = maxLoanDuration; }
+    public void setMaxLoanCount(int maxLoanCount) { this.maxLoanCount = maxLoanCount; }
+    public void setReloanCooldown(int reloanCooldown) { this.reloanCooldown = reloanCooldown; }
+    public void setOpeningDaysTimes(List<String> openingDaysTimes) { this.openingDaysTimes = openingDaysTimes; }
+    public void setBooks(List<String> books) { this.books = books; }
+    public void setUsers(List<String> users) { this.users = users; }
+    public void setAdmins(List<String> admins) { this.admins = admins; }
+    public void setLoans(List<String> loans) { this.loans = loans; }
 }
