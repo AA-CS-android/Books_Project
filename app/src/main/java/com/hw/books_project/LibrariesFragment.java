@@ -20,7 +20,7 @@ import com.hw.books_project.models.Library;
 
 import java.util.ArrayList;
 
-public class LibrariesFragment extends Fragment {
+public class LibrariesFragment extends Fragment implements SearchHelper.OnLibrarySelectedListener {
 
     private FragmentLibariesBinding binding;
     private ArrayAdapter<Library> mainAdapter;
@@ -45,22 +45,27 @@ public class LibrariesFragment extends Fragment {
     }
 
     private void init() {
-        // 1. Initialize Adapters
         mainAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, libraryList);
         suggestionsAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
         binding.libsList.setAdapter(mainAdapter);
         binding.searchListView.setAdapter(suggestionsAdapter);
 
-        // 2. Fetch Data from Firebase
         fetchLibraries();
 
-        // 3. Setup Search using the new helper
-        SearchHelper.setupSearch(requireContext(), binding.libSearchBar, binding.searchView, binding.searchListView, mainAdapter, suggestionsAdapter, libraryList);
+        // Pass 'this' as the listener
+        SearchHelper.setupSearch(requireContext(), binding.libSearchBar, binding.searchView, binding.searchListView, mainAdapter, suggestionsAdapter, libraryList, this);
 
-        // 4. Other Listeners
         binding.createLibBtn.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), CreateLibraryActivity.class);
             startActivity(intent);
+        });
+
+        // Set item click listener for the main list to use the same callback
+        binding.libsList.setOnItemClickListener((parent, view, position, id) -> {
+            Library selectedLibrary = mainAdapter.getItem(position);
+            if (selectedLibrary != null) {
+                onLibrarySelected(selectedLibrary);
+            }
         });
     }
 
@@ -83,6 +88,18 @@ public class LibrariesFragment extends Fragment {
                 Toast.makeText(requireContext(), "Failed to load libraries.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * Handles the selection of a library from either the main list or the search suggestions.
+     * This method is called by the OnItemClickListener of the main list and by the SearchHelper.
+     * @param library The selected library.
+     */
+    @Override
+    public void onLibrarySelected(Library library) {
+        Intent intent = new Intent(requireContext(), LibraryViewActivity.class);
+        intent.putExtra("library", library);
+        startActivity(intent);
     }
 
     @Override

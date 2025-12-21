@@ -5,7 +5,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
@@ -14,6 +13,13 @@ import com.hw.books_project.models.Library;
 import java.util.ArrayList;
 
 public class SearchHelper {
+
+    /**
+     * A callback interface to notify when a library has been selected.
+     */
+    public interface OnLibrarySelectedListener {
+        void onLibrarySelected(Library library);
+    }
 
     /**
      * Sets up the search functionality for a library list.
@@ -25,8 +31,9 @@ public class SearchHelper {
      * @param mainAdapter        The ArrayAdapter for the main list.
      * @param suggestionsAdapter The ArrayAdapter for the suggestions list.
      * @param fullLibraryList    The complete list of libraries to be searched.
+     * @param listener           The callback for when a library is selected.
      */
-    public static void setupSearch(Context context, SearchBar searchBar, SearchView searchView, ListView searchListView, ArrayAdapter<Library> mainAdapter, ArrayAdapter<Library> suggestionsAdapter, ArrayList<Library> fullLibraryList) {
+    public static void setupSearch(Context context, SearchBar searchBar, SearchView searchView, ListView searchListView, ArrayAdapter<Library> mainAdapter, ArrayAdapter<Library> suggestionsAdapter, ArrayList<Library> fullLibraryList, OnLibrarySelectedListener listener) {
 
         // 1. Show the search view when the search bar is clicked
         searchBar.setOnClickListener(v -> searchView.show());
@@ -53,14 +60,12 @@ public class SearchHelper {
             public void afterTextChanged(Editable s) { }
         });
 
-        // 3. Handle clicks on items in the suggestions list
+        // 3. Handle clicks on items in the suggestions list by calling the listener
         searchListView.setOnItemClickListener((parent, view, position, id) -> {
             Library selectedLibrary = suggestionsAdapter.getItem(position);
             if (selectedLibrary != null) {
-                searchBar.setText(selectedLibrary.getName());
                 searchView.hide();
-                // You could add navigation logic here
-                Toast.makeText(context, "Selected: " + selectedLibrary.getName(), Toast.LENGTH_SHORT).show();
+                listener.onLibrarySelected(selectedLibrary);
             }
         });
 

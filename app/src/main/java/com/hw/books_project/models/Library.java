@@ -2,9 +2,10 @@ package com.hw.books_project.models;
 
 import androidx.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Library {
+public class Library implements Serializable {
     private String uid;
     private String name;
     private int maxLoanDuration;
