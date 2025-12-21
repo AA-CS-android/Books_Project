@@ -14,17 +14,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.databinding.FragmentLibariesBinding;
+import com.hw.books_project.models.Library;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class LibrariesFragment extends Fragment {
 
     private FragmentLibariesBinding binding;
-    private ArrayAdapter<String> mainAdapter;
-    private ArrayAdapter<String> suggestionsAdapter;
-    private ArrayList<String> demoArr;
+    private ArrayAdapter<Library> mainAdapter;
+    private ArrayAdapter<Library> suggestionsAdapter;
+    private ArrayList<Library> libraryList = new ArrayList<>();
 
     public LibrariesFragment() {
         // Required empty public constructor
@@ -44,77 +47,96 @@ public class LibrariesFragment extends Fragment {
     }
 
     private void init() {
-        // 1. Initialize Demo Data
-        String[] initialData = {"Central Library", "City Archive", "Community Bookstop", "University Main Lib", "Science Fiction Hub", "History Corner", "Kids Reading Room", "Tech Library"};
-        demoArr = new ArrayList<>(Arrays.asList(initialData));
-
-        // 2. Initialize Adapters
-        mainAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, demoArr);
+        // 1. Initialize Adapters
+        mainAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, libraryList);
         suggestionsAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
         binding.libsList.setAdapter(mainAdapter);
         binding.searchListView.setAdapter(suggestionsAdapter);
 
-        // --- Listeners ---
+        // 2. Fetch Data from Firebase
+        fetchLibraries();
 
+        // 3. Setup Listeners
+        setupListeners();
+    }
+
+    private void fetchLibraries() {
+        FBRef.refLibraries.limitToFirst(10).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                libraryList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Library library = dataSnapshot.getValue(Library.class);
+                    if (library != null) {
+                        libraryList.add(library);
+                    }
+                }
+                mainAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(requireContext(), "Failed to load libraries.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupListeners() {
         binding.createLibBtn.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Create Library Button Clicked", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(requireContext(), CreateLibraryActivity.class);
             startActivity(intent);
-            //TODO: maybe later change to registerForActivityResult and switch to the new library
         });
 
         binding.libSearchBar.setOnClickListener(v -> binding.searchView.show());
 
-        // 3. TextWatcher for real-time suggestions
         binding.searchView.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterList(s.toString());
+                filterSuggestions(s.toString());
             }
 
             @Override
             public void afterTextChanged(Editable s) { }
         });
 
-        // Handle item click in suggestions list
         binding.searchListView.setOnItemClickListener((parent, view, position, id) -> {
-            Toast.makeText(requireContext(), "Item Clicked: " + suggestionsAdapter.getItem(position), Toast.LENGTH_SHORT).show();
-//            String selectedItem = suggestionsAdapter.getItem(position);
-//            binding.libSearchBar.setText(selectedItem);
-//            binding.searchView.hide();
-//            mainAdapter.getFilter().filter(selectedItem);
+            Library selectedLibrary = suggestionsAdapter.getItem(position);
+            if (selectedLibrary != null) {
+                binding.libSearchBar.setText(selectedLibrary.getName());
+                binding.searchView.hide();
+                // You might want to navigate to a detail screen here
+                Toast.makeText(requireContext(), "Selected: " + selectedLibrary.getName(), Toast.LENGTH_SHORT).show();
+            }
         });
 
-        // 4. Handle search submit
         binding.searchView.getEditText().setOnEditorActionListener((v, actionId, event) -> {
             String query = binding.searchView.getText().toString();
             binding.libSearchBar.setText(query);
             binding.searchView.hide();
+            // This will filter the main list
             mainAdapter.getFilter().filter(query);
             return false;
         });
+    }
+
+    private void filterSuggestions(String query) {
+        ArrayList<Library> filteredSuggestions = new ArrayList<>();
+        for (Library library : libraryList) {
+            if (library.getName() != null && library.getName().toLowerCase().contains(query.toLowerCase())) {
+                filteredSuggestions.add(library);
+            }
+        }
+        suggestionsAdapter.clear();
+        suggestionsAdapter.addAll(filteredSuggestions);
+        suggestionsAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    private void filterList(String query)
-    {
-        suggestionsAdapter.clear();
-        ArrayList<String> filteredSuggestions = new ArrayList<>();
-        for (String item : demoArr) {
-            if (item.toLowerCase().contains(query.toLowerCase())) {
-                suggestionsAdapter.add(item);
-            }
-        }
-//        suggestionsAdapter.clear();
-        //suggestionsAdapter.addAll(filteredSuggestions);
-        suggestionsAdapter.notifyDataSetChanged();
     }
 }

@@ -1,5 +1,7 @@
 package com.hw.books_project.models;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 public class Library {
@@ -43,4 +45,14 @@ public class Library {
     public void setUsers(List<String> users) { this.users = users; }
     public void setAdmins(List<String> admins) { this.admins = admins; }
     public void setLoans(List<String> loans) { this.loans = loans; }
+
+    /**
+     * This method is used by the ArrayAdapter to display the object in the ListView.
+     * @return The name of the library.
+     */
+    @NonNull
+    @Override
+    public String toString() {
+        return this.name != null ? this.name : "Unnamed Library";
+    }
 }
