@@ -2,8 +2,6 @@ package com.hw.books_project;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,8 +54,14 @@ public class LibrariesFragment extends Fragment {
         // 2. Fetch Data from Firebase
         fetchLibraries();
 
-        // 3. Setup Listeners
-        setupListeners();
+        // 3. Setup Search using the new helper
+        SearchHelper.setupSearch(requireContext(), binding.libSearchBar, binding.searchView, binding.searchListView, mainAdapter, suggestionsAdapter, libraryList);
+
+        // 4. Other Listeners
+        binding.createLibBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), CreateLibraryActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void fetchLibraries() {
@@ -79,59 +83,6 @@ public class LibrariesFragment extends Fragment {
                 Toast.makeText(requireContext(), "Failed to load libraries.", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void setupListeners() {
-        binding.createLibBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), CreateLibraryActivity.class);
-            startActivity(intent);
-        });
-
-        binding.libSearchBar.setOnClickListener(v -> binding.searchView.show());
-
-        binding.searchView.getEditText().addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterSuggestions(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
-        });
-
-        binding.searchListView.setOnItemClickListener((parent, view, position, id) -> {
-            Library selectedLibrary = suggestionsAdapter.getItem(position);
-            if (selectedLibrary != null) {
-                binding.libSearchBar.setText(selectedLibrary.getName());
-                binding.searchView.hide();
-                // You might want to navigate to a detail screen here
-                Toast.makeText(requireContext(), "Selected: " + selectedLibrary.getName(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        binding.searchView.getEditText().setOnEditorActionListener((v, actionId, event) -> {
-            String query = binding.searchView.getText().toString();
-            binding.libSearchBar.setText(query);
-            binding.searchView.hide();
-            // This will filter the main list
-            mainAdapter.getFilter().filter(query);
-            return false;
-        });
-    }
-
-    private void filterSuggestions(String query) {
-        ArrayList<Library> filteredSuggestions = new ArrayList<>();
-        for (Library library : libraryList) {
-            if (library.getName() != null && library.getName().toLowerCase().contains(query.toLowerCase())) {
-                filteredSuggestions.add(library);
-            }
-        }
-        suggestionsAdapter.clear();
-        suggestionsAdapter.addAll(filteredSuggestions);
-        suggestionsAdapter.notifyDataSetChanged();
     }
 
     @Override
