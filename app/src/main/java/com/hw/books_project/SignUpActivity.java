@@ -10,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.hw.books_project.databinding.ActivitySignupBinding;
 import com.hw.books_project.models.User;
 
@@ -36,17 +34,16 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void signUpUser() {
-        String firstName = binding.eTFirstName.getText().toString();
-        String lastName = binding.eTLastName.getText().toString();
-        String email = binding.eTMail.getText().toString();
-        String password = binding.eTPass.getText().toString();
+        String firstName = binding.eTFirstName.getText().toString().trim();
+        String lastName = binding.eTLastName.getText().toString().trim();
+        String email = binding.eTMail.getText().toString().trim();
+        String password = binding.eTPass.getText().toString().trim();
 
         if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
             binding.tVMsg.setText("Please fill all fields");
             return;
         }
 
-        Log.i("MainActivity", "mail: " + email + " pass: " + password + " full name: " + firstName + " " + lastName);
         ProgressDialog pd = new ProgressDialog(this);
         pd.setTitle("Connecting");
         pd.setMessage("Creating user");
@@ -54,25 +51,34 @@ public class SignUpActivity extends AppCompatActivity {
 
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
-                    pd.dismiss();
                     if (task.isSuccessful()) {
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
-                            // Save user to Realtime Database
+                            // Create and save user to Realtime Database
                             User user = new User(firstName + " " + lastName, email, firebaseUser.getUid());
+                            FBRef.refUsers.child(firebaseUser.getUid()).setValue(user).addOnCompleteListener(dbTask -> {
+                                pd.dismiss();
+                                if (dbTask.isSuccessful()) {
+                                    // Set the global user object
+                                    FBRef.currentUser = user;
 
-                            FBRef.refUsers.child(firebaseUser.getUid()).setValue(user);
+                                    // Save remember me preference
+                                    SharedPreferences.Editor editor = sharedPref.edit();
+                                    editor.putBoolean("rememberMe", binding.rememberMe.isChecked());
+                                    editor.apply();
 
-                            SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putBoolean("rememberMe", binding.rememberMe.isChecked());
-                            editor.apply();
-
-                            Log.i("SignUpActivity", "createUserWithEmailAndPassword: success");
-                            Intent intent = new Intent(SignUpActivity.this, HomeScreenAct.class);
-                            startActivity(intent);
-                            finish();
+                                    Log.i("SignUpActivity", "User created and saved successfully.");
+                                    Intent intent = new Intent(SignUpActivity.this, HomeScreenAct.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    binding.tVMsg.setText("Failed to save user data.");
+                                    Log.w("SignUpActivity", "saveUser:failure", dbTask.getException());
+                                }
+                            });
                         }
                     } else {
+                        pd.dismiss();
                         binding.tVMsg.setText(FBRef.firebaseAuthError(task.getException()));
                         Log.w("SignUpActivity", "createUserWithEmail:failure", task.getException());
                     }

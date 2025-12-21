@@ -10,18 +10,15 @@ public class Book
     private String publisher;
     private String release_date;
     private String language;
-
-    /*
-        If not borrowed then empty
-        Else will hold the phone number/mail of current holder
-    */
     private String status;
-
-//    private String googleBooksID;
-//    private String selfLink;
     private String ISBN;
     private String danacode;
 
+    /**
+     * Default constructor required for calls to DataSnapshot.getValue(Book.class)
+     */
+    public Book() {
+    }
     
     public Book(String name, List<String> genres, String author, String publisher, String release_date, String language, String status, String ISBN, String danacode) {
         this.name = name;

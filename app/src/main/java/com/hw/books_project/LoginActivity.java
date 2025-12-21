@@ -6,11 +6,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.databinding.ActivityLoginBinding;
+import com.hw.books_project.models.User;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -33,35 +38,51 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUser() {
-        String email = binding.eTMail.getText().toString();
-        String password = binding.eTPass.getText().toString();
+        String email = binding.eTMail.getText().toString().trim();
+        String password = binding.eTPass.getText().toString().trim();
+
         if (email.isEmpty() || password.isEmpty()) {
             binding.tVMsg.setText("Please fill all fields");
             return;
         }
 
-        Log.i("MainActivity", "mail: " + email + " pass: " + password);
         ProgressDialog pd = new ProgressDialog(this);
-        pd.setTitle("Connecting");
         pd.setMessage("Logging in...");
         pd.show();
 
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
-                    pd.dismiss();
                     if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {
-                            SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putBoolean("rememberMe", binding.rememberMe.isChecked());
-                            editor.apply();
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            // Fetch user data from Realtime Database
+                            FBRef.refUsers.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    pd.dismiss();
+                                    FBRef.currentUser = snapshot.getValue(User.class);
 
-                            Log.i("LoginActivity", "signInUserWithEmailAndPassword: success");
-                            Intent intent = new Intent(LoginActivity.this, HomeScreenAct.class);
-                            startActivity(intent);
-                            finish();
+                                    // Save remember me preference
+                                    SharedPreferences.Editor editor = sharedPref.edit();
+                                    editor.putBoolean("rememberMe", binding.rememberMe.isChecked());
+                                    editor.apply();
+
+                                    Log.i("LoginActivity", "User logged in successfully.");
+                                    Intent intent = new Intent(LoginActivity.this, HomeScreenAct.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    pd.dismiss();
+                                    binding.tVMsg.setText("Failed to load user data.");
+                                    Log.w("LoginActivity", "loadUser:onCancelled", error.toException());
+                                }
+                            });
                         }
                     } else {
+                        pd.dismiss();
                         binding.tVMsg.setText(FBRef.firebaseAuthError(task.getException()));
                         Log.w("LoginActivity", "signInWithEmail:failure", task.getException());
                     }

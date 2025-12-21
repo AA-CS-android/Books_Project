@@ -10,6 +10,11 @@ public class Loan {
     private Date dueDate;
     private boolean returned;
 
+    /**
+     * Default constructor required for calls to DataSnapshot.getValue(Loan.class)
+     */
+    public Loan() {
+    }
 
     public Loan(Library library, Book book, User loaner, Date loanDate, Date dueDate, boolean returned) {
         this.library = library;
