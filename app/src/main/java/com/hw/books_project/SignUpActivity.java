@@ -69,6 +69,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                                     Log.i("SignUpActivity", "User created and saved successfully.");
                                     Intent intent = new Intent(SignUpActivity.this, HomeScreenAct.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     startActivity(intent);
                                     finish();
                                 } else {

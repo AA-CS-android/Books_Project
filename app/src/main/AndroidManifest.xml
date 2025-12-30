@@ -35,10 +35,13 @@
             android:name=".HomeScreenAct"
             android:exported="false" />
         <activity
+            android:name=".LibraryInfoActivity"
+            android:exported="false" />
+        <activity
             android:name=".LibraryViewActivity"
             android:exported="false" />
         <activity
-            android:name=".LibraryInfoActivity"
+            android:name=".JoinLibraryActivity"
             android:exported="false" />
 
     </application>

@@ -207,6 +207,8 @@ public class CreateLibraryActivity extends AppCompatActivity {
         newLibrary.setReloanCooldown(cooldown);
         newLibrary.setOpeningDaysTimes(openingDaysTimes);
         newLibrary.setAdmins(admins);
+        newLibrary.setUsers(new ArrayList<>());
+
 
         FBRef.refLibraries.child(key).setValue(newLibrary).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

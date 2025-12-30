@@ -1,6 +1,7 @@
 package com.hw.books_project;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,8 +21,8 @@ import java.util.List;
 
 public class LibraryInfoActivity extends AppCompatActivity {
 
-    private TextView tvLibraryName, tvOpeningHours;
-    private ListView lvAdmins;
+    private TextView tvLibraryName, tvOpeningHours, tvMembersLabel;
+    private ListView lvAdmins, lvMembers;
     private Library library;
 
     @Override
@@ -45,12 +46,13 @@ public class LibraryInfoActivity extends AppCompatActivity {
         tvLibraryName = findViewById(R.id.tvLibraryName);
         tvOpeningHours = findViewById(R.id.tvOpeningHours);
         lvAdmins = findViewById(R.id.lvAdmins);
+        tvMembersLabel = findViewById(R.id.tvMembersLabel);
+        lvMembers = findViewById(R.id.lvMembers);
     }
 
     private void displayLibraryInfo() {
         tvLibraryName.setText(library.getName());
 
-        // Format and display opening hours
         if (library.getOpeningDaysTimes() != null) {
             StringBuilder hoursBuilder = new StringBuilder();
             for (String dayTime : library.getOpeningDaysTimes()) {
@@ -59,31 +61,40 @@ public class LibraryInfoActivity extends AppCompatActivity {
             tvOpeningHours.setText(hoursBuilder.toString());
         }
 
-        // Fetch and display admin names
         if (library.getAdmins() != null) {
-            fetchAdminNames(library.getAdmins());
+            fetchAndDisplayUserNames(library.getAdmins(), lvAdmins);
+        }
+
+        // Check if the current user is an admin to show the members list
+        User currentUser = FBRef.currentUser;
+        if (currentUser != null && library.getAdmins() != null && library.getAdmins().contains(currentUser.getUid())) {
+            tvMembersLabel.setVisibility(View.VISIBLE);
+            lvMembers.setVisibility(View.VISIBLE);
+            if (library.getUsers() != null) {
+                fetchAndDisplayUserNames(library.getUsers(), lvMembers);
+            }
         }
     }
 
-    private void fetchAdminNames(List<String> adminUids) {
-        ArrayList<String> adminNames = new ArrayList<>();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, adminNames);
-        lvAdmins.setAdapter(adapter);
+    private void fetchAndDisplayUserNames(List<String> uids, ListView listView) {
+        ArrayList<String> names = new ArrayList<>();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, names);
+        listView.setAdapter(adapter);
 
-        for (String uid : adminUids) {
+        for (String uid : uids) {
             FBRef.refUsers.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    User admin = snapshot.getValue(User.class);
-                    if (admin != null) {
-                        adminNames.add(admin.getName());
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        names.add(user.getName());
                         adapter.notifyDataSetChanged();
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(LibraryInfoActivity.this, "Failed to load admin names.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LibraryInfoActivity.this, "Failed to load user names.", Toast.LENGTH_SHORT).show();
                 }
             });
         }

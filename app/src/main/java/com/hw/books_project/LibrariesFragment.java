@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.databinding.FragmentLibariesBinding;
 import com.hw.books_project.models.Library;
+import com.hw.books_project.models.User;
 
 import java.util.ArrayList;
 
@@ -52,7 +53,6 @@ public class LibrariesFragment extends Fragment implements SearchHelper.OnLibrar
 
         fetchLibraries();
 
-        // Pass 'this' as the listener
         SearchHelper.setupSearch(requireContext(), binding.libSearchBar, binding.searchView, binding.searchListView, mainAdapter, suggestionsAdapter, libraryList, this);
 
         binding.createLibBtn.setOnClickListener(v -> {
@@ -60,7 +60,6 @@ public class LibrariesFragment extends Fragment implements SearchHelper.OnLibrar
             startActivity(intent);
         });
 
-        // Set item click listener for the main list to use the same callback
         binding.libsList.setOnItemClickListener((parent, view, position, id) -> {
             Library selectedLibrary = mainAdapter.getItem(position);
             if (selectedLibrary != null) {
@@ -90,16 +89,23 @@ public class LibrariesFragment extends Fragment implements SearchHelper.OnLibrar
         });
     }
 
-    /**
-     * Handles the selection of a library from either the main list or the search suggestions.
-     * This method is called by the OnItemClickListener of the main list and by the SearchHelper.
-     * @param library The selected library.
-     */
     @Override
     public void onLibrarySelected(Library library) {
-        Intent intent = new Intent(requireContext(), LibraryViewActivity.class);
-        intent.putExtra("library", library);
-        startActivity(intent);
+        User currentUser = FBRef.currentUser;
+        if (currentUser != null &&
+                (library.getUsers() != null && library.getUsers().contains(currentUser.getUid())) ||
+                (library.getAdmins() != null && library.getAdmins().contains(currentUser.getUid()))
+        ) {
+            // User is a member, go to the library view
+            Intent intent = new Intent(requireContext(), LibraryViewActivity.class);
+            intent.putExtra("library", library);
+            startActivity(intent);
+        } else {
+            // User is not a member, go to the join screen
+            Intent intent = new Intent(requireContext(), JoinLibraryActivity.class);
+            intent.putExtra("library", library);
+            startActivity(intent);
+        }
     }
 
     @Override
