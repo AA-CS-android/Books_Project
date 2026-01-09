@@ -3,29 +3,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".AddBookActivity">
+    tools:context=".AddBookSearchActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="How would you like to add a book?"
-        android:textSize="22sp"
-        android:textAlignment="center"
-        android:layout_marginBottom="32dp"/>
-
-    <Button
-        android:id="@+id/btnAddManually"
+    <EditText
+        android:id="@+id/etBookName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Manually" />
+        android:hint="Book Name" />
 
-    <Button
-        android:id="@+id/btnSearchOnline"
+    <EditText
+        android:id="@+id/etISBN"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Search Online" />
+        android:hint="ISBN" />
+
+    <EditText
+        android:id="@+id/etDanacode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Danacode" />
+
+    <Button
+        android:id="@+id/btnSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Search" />
 
 </LinearLayout>

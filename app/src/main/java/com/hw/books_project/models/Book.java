@@ -1,9 +1,11 @@
 package com.hw.books_project.models;
 
+import androidx.annotation.NonNull;
+
+import java.io.Serializable;
 import java.util.List;
 
-public class Book
-{
+public class Book implements Serializable {
     private String uid;
     private String name;
     private String cover_image_url;
@@ -16,9 +18,6 @@ public class Book
     private String ISBN;
     private String danacode;
 
-    /**
-     * Default constructor required for calls to DataSnapshot.getValue(Book.class)
-     */
     public Book() {
     }
 
@@ -122,5 +121,11 @@ public class Book
 
     public void setDanacode(String danacode) {
         this.danacode = danacode;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return this.name != null ? this.name : "Unnamed Book";
     }
 }
