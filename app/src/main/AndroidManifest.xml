@@ -43,6 +43,9 @@
         <activity
             android:name=".JoinLibraryActivity"
             android:exported="false" />
+        <activity
+            android:name=".AddBookActivity"
+            android:exported="false" />
 
     </application>
 

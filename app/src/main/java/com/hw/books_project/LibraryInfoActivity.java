@@ -3,6 +3,7 @@ package com.hw.books_project;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ public class LibraryInfoActivity extends AppCompatActivity {
     private TextView tvLibraryName, tvOpeningHours, tvMembersLabel;
     private ListView lvAdmins, lvMembers;
     private Library library;
+    private Button backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,9 @@ public class LibraryInfoActivity extends AppCompatActivity {
         lvAdmins = findViewById(R.id.lvAdmins);
         tvMembersLabel = findViewById(R.id.tvMembersLabel);
         lvMembers = findViewById(R.id.lvMembers);
+        backButton = findViewById(R.id.backButton);
+
+        backButton.setOnClickListener(v -> finish());
     }
 
     private void displayLibraryInfo() {

@@ -4,7 +4,9 @@ import java.util.List;
 
 public class Book
 {
+    private String uid;
     private String name;
+    private String cover_image_url;
     private List<String> genres;
     private String author;
     private String publisher;
@@ -19,9 +21,11 @@ public class Book
      */
     public Book() {
     }
-    
-    public Book(String name, List<String> genres, String author, String publisher, String release_date, String language, String status, String ISBN, String danacode) {
+
+    public Book(String uid, String name, String cover_image_url, List<String> genres, String author, String publisher, String release_date, String language, String status, String ISBN, String danacode) {
+        this.uid = uid;
         this.name = name;
+        this.cover_image_url = cover_image_url;
         this.genres = genres;
         this.author = author;
         this.publisher = publisher;
@@ -32,12 +36,28 @@ public class Book
         this.danacode = danacode;
     }
 
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCover_image_url() {
+        return cover_image_url;
+    }
+
+    public void setCover_image_url(String cover_image_url) {
+        this.cover_image_url = cover_image_url;
     }
 
     public List<String> getGenres() {

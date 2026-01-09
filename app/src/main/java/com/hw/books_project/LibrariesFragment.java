@@ -96,7 +96,7 @@ public class LibrariesFragment extends Fragment implements SearchHelper.OnLibrar
                 (library.getUsers() != null && library.getUsers().contains(currentUser.getUid())) ||
                 (library.getAdmins() != null && library.getAdmins().contains(currentUser.getUid()))
         ) {
-            // User is a member, go to the library view
+            // User is a member or an admin, go to the library view
             Intent intent = new Intent(requireContext(), LibraryViewActivity.class);
             intent.putExtra("library", library);
             startActivity(intent);

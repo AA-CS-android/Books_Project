@@ -49,8 +49,9 @@ public class LibraryViewActivity extends AppCompatActivity {
         });
 
         binding.fabAddBook.setOnClickListener(v -> {
-            // TODO: Implement logic to add a new book
-            Toast.makeText(this, "Add book clicked!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, AddBookActivity.class);
+            intent.putExtra("library", library);
+            startActivity(intent);
         });
 
         // TODO: Setup book search and list
