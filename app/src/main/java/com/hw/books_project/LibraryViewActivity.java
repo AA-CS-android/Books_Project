@@ -2,7 +2,9 @@ package com.hw.books_project;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
@@ -50,17 +52,17 @@ public class LibraryViewActivity extends AppCompatActivity {
         User currentUser = FBRef.currentUser;
         if (currentUser != null && library.getAdmins() != null && library.getAdmins().contains(currentUser.getUid())) {
             binding.fabAddBook.setVisibility(View.VISIBLE);
+
+            binding.fabAddBook.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AddBookActivity.class);
+                intent.putExtra("library", library);
+                startActivity(intent);
+            });
         }
 
         // Set up listeners for the info and add book buttons
         binding.btnInfo.setOnClickListener(v -> {
             Intent intent = new Intent(this, LibraryInfoActivity.class);
-            intent.putExtra("library", library);
-            startActivity(intent);
-        });
-
-        binding.fabAddBook.setOnClickListener(v -> {
-            Intent intent = new Intent(this, AddBookActivity.class);
             intent.putExtra("library", library);
             startActivity(intent);
         });
@@ -84,13 +86,17 @@ public class LibraryViewActivity extends AppCompatActivity {
      */
     private void setupBookSearch() {
         binding.bookSearchBar.setOnClickListener(v -> binding.bookSearchView.show());
+        binding.bookSearchView.getEditText().setSingleLine();
 
         binding.bookSearchView.getEditText().setOnEditorActionListener((v, actionId, event) -> {
-            String query = binding.bookSearchView.getText().toString().trim();
-            binding.bookSearchBar.setText(query);
-            binding.bookSearchView.hide();
-            if (!query.isEmpty()) {
-                searchBooks(query);
+            Log.d("LibraryViewActivity:", "search listener trigger: " + actionId);
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                String query = binding.bookSearchView.getText().toString().trim();
+                binding.bookSearchBar.setText(query);
+                binding.bookSearchView.hide();
+                if (!query.isEmpty()) {
+                    searchBooks(query);
+                }
             }
             return false;
         });
@@ -111,6 +117,7 @@ public class LibraryViewActivity extends AppCompatActivity {
 
         // Iterate through the list of book UIDs in the library
         for (String bookUid : library.getBooks()) {
+
             // Fetch the details for each book from the global /Books node
             FBRef.refBooks.child(bookUid).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override

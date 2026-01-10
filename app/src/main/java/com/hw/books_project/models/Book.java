@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Book implements Serializable {
-    private String uid;
+    private String bookId;
     private String name;
     private String cover_image_url;
     private List<String> genres;
@@ -21,8 +21,8 @@ public class Book implements Serializable {
     public Book() {
     }
 
-    public Book(String uid, String name, String cover_image_url, List<String> genres, String author, String publisher, String release_date, String language, String status, String ISBN, String danacode) {
-        this.uid = uid;
+    public Book(String bookId, String name, String cover_image_url, List<String> genres, String author, String publisher, String release_date, String language, String status, String ISBN, String danacode) {
+        this.bookId = bookId;
         this.name = name;
         this.cover_image_url = cover_image_url;
         this.genres = genres;
@@ -35,12 +35,12 @@ public class Book implements Serializable {
         this.danacode = danacode;
     }
 
-    public String getUid() {
-        return uid;
+    public String getBookId() {
+        return bookId;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setBookId(String bookId) {
+        this.bookId = bookId;
     }
 
     public String getName() {
