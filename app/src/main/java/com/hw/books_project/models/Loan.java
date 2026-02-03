@@ -1,8 +1,12 @@
 package com.hw.books_project.models;
 
+import androidx.annotation.NonNull;
+
 import java.util.Date;
 
 public class Loan {
+    @NonNull
+    private String loanId = "Null";
     private Library library;
     private Book book;
     private User loaner;
@@ -16,13 +20,22 @@ public class Loan {
     public Loan() {
     }
 
-    public Loan(Library library, Book book, User loaner, Date loanDate, Date dueDate, boolean returned) {
+    public Loan(String loanId, Library library, Book book, User loaner, Date loanDate, Date dueDate, boolean returned) {
+        this.loanId = loanId;
         this.library = library;
         this.book = book;
         this.loaner = loaner;
         this.loanDate = loanDate;
         this.dueDate = dueDate;
         this.returned = returned;
+    }
+
+    public String getLoanId() {
+        return loanId;
+    }
+
+    public void setLoanId(String loanId) {
+        this.loanId = loanId;
     }
 
     public Library getLibrary() {

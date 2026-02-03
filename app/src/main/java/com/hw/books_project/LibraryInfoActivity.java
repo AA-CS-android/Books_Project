@@ -19,10 +19,11 @@ import com.hw.books_project.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class LibraryInfoActivity extends AppCompatActivity {
 
-    private TextView tvLibraryName, tvOpeningHours, tvMembersLabel;
+    private TextView tvLibraryName, tvMembersLabel;
     private ListView lvAdmins, lvMembers;
     private Library library;
     private Button backButton;
@@ -46,7 +47,6 @@ public class LibraryInfoActivity extends AppCompatActivity {
 
     private void init() {
         tvLibraryName = findViewById(R.id.tvLibraryName);
-        tvOpeningHours = findViewById(R.id.tvOpeningHours);
         lvAdmins = findViewById(R.id.lvAdmins);
         tvMembersLabel = findViewById(R.id.tvMembersLabel);
         lvMembers = findViewById(R.id.lvMembers);
@@ -58,25 +58,16 @@ public class LibraryInfoActivity extends AppCompatActivity {
     private void displayLibraryInfo() {
         tvLibraryName.setText(library.getName());
 
-        if (library.getOpeningDaysTimes() != null) {
-            StringBuilder hoursBuilder = new StringBuilder();
-            for (String dayTime : library.getOpeningDaysTimes()) {
-                hoursBuilder.append(dayTime).append("\n");
-            }
-            tvOpeningHours.setText(hoursBuilder.toString());
-        }
-
         if (library.getAdmins() != null) {
-            fetchAndDisplayUserNames(library.getAdmins(), lvAdmins);
+            fetchAndDisplayUserNames(new ArrayList<>(library.getAdmins().keySet()), lvAdmins);
         }
 
-        // Check if the current user is an admin to show the members list
         User currentUser = FBRef.currentUser;
-        if (currentUser != null && library.getAdmins() != null && library.getAdmins().contains(currentUser.getUid())) {
+        if (currentUser != null && library.getAdmins() != null && library.getAdmins().containsKey(currentUser.getUid())) {
             tvMembersLabel.setVisibility(View.VISIBLE);
             lvMembers.setVisibility(View.VISIBLE);
             if (library.getUsers() != null) {
-                fetchAndDisplayUserNames(library.getUsers(), lvMembers);
+                fetchAndDisplayUserNames(new ArrayList<>(library.getUsers().keySet()), lvMembers);
             }
         }
     }

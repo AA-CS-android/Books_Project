@@ -1,9 +1,7 @@
 package com.hw.books_project;
 
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -17,19 +15,14 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.models.Library;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CreateLibraryActivity extends AppCompatActivity {
 
     private TextInputEditText etLibName;
     private EditText etMaxDuration, etMaxCount, etCooldown;
     private Button btnCreateLibrary;
-
-    private CheckBox cbSun, cbMon, cbTue, cbWed, cbThu, cbFri, cbSat;
-    private Button btnOpenSun, btnCloseSun, btnOpenMon, btnCloseMon, btnOpenTue, btnCloseTue, btnOpenWed, btnCloseWed, btnOpenThu, btnCloseThu, btnOpenFri, btnCloseFri, btnOpenSat, btnCloseSat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,48 +38,9 @@ public class CreateLibraryActivity extends AppCompatActivity {
         etCooldown = findViewById(R.id.etCooldown);
         btnCreateLibrary = findViewById(R.id.btnCreateLibrary);
 
-        initDayViews();
         initIncDecButtons();
 
         btnCreateLibrary.setOnClickListener(v -> createLibrary());
-    }
-
-    private void initDayViews() {
-        cbSun = findViewById(R.id.cbSun); btnOpenSun = findViewById(R.id.btnOpenSun); btnCloseSun = findViewById(R.id.btnCloseSun);
-        cbMon = findViewById(R.id.cbMon); btnOpenMon = findViewById(R.id.btnOpenMon); btnCloseMon = findViewById(R.id.btnCloseMon);
-        cbTue = findViewById(R.id.cbTue); btnOpenTue = findViewById(R.id.btnOpenTue); btnCloseTue = findViewById(R.id.btnCloseTue);
-        cbWed = findViewById(R.id.cbWed); btnOpenWed = findViewById(R.id.btnOpenWed); btnCloseWed = findViewById(R.id.btnCloseWed);
-        cbThu = findViewById(R.id.cbThu); btnOpenThu = findViewById(R.id.btnOpenThu); btnCloseThu = findViewById(R.id.btnCloseThu);
-        cbFri = findViewById(R.id.cbFri); btnOpenFri = findViewById(R.id.btnOpenFri); btnCloseFri = findViewById(R.id.btnCloseFri);
-        cbSat = findViewById(R.id.cbSat); btnOpenSat = findViewById(R.id.btnOpenSat); btnCloseSat = findViewById(R.id.btnCloseSat);
-
-        setupDayLogic(cbSun, btnOpenSun, btnCloseSun);
-        setupDayLogic(cbMon, btnOpenMon, btnCloseMon);
-        setupDayLogic(cbTue, btnOpenTue, btnCloseTue);
-        setupDayLogic(cbWed, btnOpenWed, btnCloseWed);
-        setupDayLogic(cbThu, btnOpenThu, btnCloseThu);
-        setupDayLogic(cbFri, btnOpenFri, btnCloseFri);
-        setupDayLogic(cbSat, btnOpenSat, btnCloseSat);
-    }
-
-    private void setupDayLogic(CheckBox cb, Button btnOpen, Button btnClose) {
-        cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            btnOpen.setEnabled(isChecked);
-            btnClose.setEnabled(isChecked);
-        });
-
-        btnOpen.setOnClickListener(v -> showTimePicker(btnOpen));
-        btnClose.setOnClickListener(v -> showTimePicker(btnClose));
-    }
-
-    private void showTimePicker(Button btn) {
-        Calendar mcurrentTime = Calendar.getInstance();
-        int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-        int minute = mcurrentTime.get(Calendar.MINUTE);
-        TimePickerDialog mTimePicker = new TimePickerDialog(CreateLibraryActivity.this, (timePicker, selectedHour, selectedMinute) ->
-                btn.setText(String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute)), hour, minute, true);
-        mTimePicker.setTitle("Select Time");
-        mTimePicker.show();
     }
 
     private void initIncDecButtons() {
@@ -117,36 +71,6 @@ public class CreateLibraryActivity extends AppCompatActivity {
         });
     }
 
-    private List<String> getOpeningDaysTimes() {
-        List<String> times = new ArrayList<>();
-        CheckBox[] checkBoxes = {cbSun, cbMon, cbTue, cbWed, cbThu, cbFri, cbSat};
-        Button[] openButtons = {btnOpenSun, btnOpenMon, btnOpenTue, btnOpenWed, btnOpenThu, btnOpenFri, btnOpenSat};
-        Button[] closeButtons = {btnCloseSun, btnCloseMon, btnCloseTue, btnCloseWed, btnCloseThu, btnCloseFri, btnCloseSat};
-
-        for (int i = 0; i < checkBoxes.length; i++) {
-            if (checkBoxes[i].isChecked()) {
-                String openTime = openButtons[i].getText().toString();
-                String closeTime = closeButtons[i].getText().toString();
-
-                if (isTimeValid(openTime, closeTime)) {
-                    times.add(checkBoxes[i].getText().toString() + ":" + openTime + "-" + closeTime);
-                } else {
-                    Toast.makeText(this, "Closing time must be after opening time for " + checkBoxes[i].getText(), Toast.LENGTH_SHORT).show();
-                    return null; // Validation failure
-                }
-            }
-        }
-        if (times.isEmpty()) {
-            Toast.makeText(this, "Please select at least one opening day.", Toast.LENGTH_SHORT).show();
-            return null;
-        }
-        return times;
-    }
-
-    private boolean isTimeValid(String open, String close) {
-        return open.compareTo(close) < 0;
-    }
-
     private void createLibrary() {
         String name = etLibName.getText().toString().trim();
         if (name.isEmpty()) {
@@ -160,11 +84,6 @@ public class CreateLibraryActivity extends AppCompatActivity {
             return;
         }
 
-        List<String> openingDaysTimes = getOpeningDaysTimes();
-        if (openingDaysTimes == null) {
-            return; // Validation failed
-        }
-
         Query nameQuery = FBRef.refLibraries.orderByChild("name").equalTo(name);
         nameQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -172,7 +91,7 @@ public class CreateLibraryActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     Toast.makeText(CreateLibraryActivity.this, "A library with this name already exists.", Toast.LENGTH_SHORT).show();
                 } else {
-                    saveLibraryToDatabase(name, openingDaysTimes, maxDuration);
+                    saveLibraryToDatabase(name, maxDuration);
                 }
             }
 
@@ -183,7 +102,7 @@ public class CreateLibraryActivity extends AppCompatActivity {
         });
     }
 
-    private void saveLibraryToDatabase(String name, List<String> openingDaysTimes, int maxDuration) {
+    private void saveLibraryToDatabase(String name, int maxDuration) {
         int maxCount = Integer.parseInt(etMaxCount.getText().toString());
         int cooldown = Integer.parseInt(etCooldown.getText().toString());
 
@@ -193,22 +112,18 @@ public class CreateLibraryActivity extends AppCompatActivity {
             return;
         }
 
-        // Create admin list and add current user
-        ArrayList<String> admins = new ArrayList<>();
+        Map<String, Boolean> admins = new HashMap<>();
         if (FBRef.currentUser != null) {
-            admins.add(FBRef.currentUser.getUid());
+            admins.put(FBRef.currentUser.getUid(), true);
         }
 
         Library newLibrary = new Library();
-        newLibrary.setUid(key);
+        newLibrary.setLibraryId(key);
         newLibrary.setName(name);
         newLibrary.setMaxLoanDuration(maxDuration);
         newLibrary.setMaxLoanCount(maxCount);
         newLibrary.setReloanCooldown(cooldown);
-        newLibrary.setOpeningDaysTimes(openingDaysTimes);
         newLibrary.setAdmins(admins);
-        newLibrary.setUsers(new ArrayList<>());
-
 
         FBRef.refLibraries.child(key).setValue(newLibrary).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

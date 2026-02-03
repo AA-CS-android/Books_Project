@@ -5,12 +5,15 @@ import android.view.inputmethod.SelectGesture;
 import androidx.annotation.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 public class User {
-    private String uid;
+    @Nullable
+    private String uid = "Null";
     private String name;
     private String email;
     private String phone;
+
     private List<Book> books_read;
     private List<Book> books_holding;
     private List<Book> books_want_to_read;

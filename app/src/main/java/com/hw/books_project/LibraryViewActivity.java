@@ -48,48 +48,39 @@ public class LibraryViewActivity extends AppCompatActivity {
     private void init() {
         binding.toolbar.setTitle(library.getName());
 
-        // Show the add book button only if the current user is an admin
         User currentUser = FBRef.currentUser;
-        if (currentUser != null && library.getAdmins() != null && library.getAdmins().contains(currentUser.getUid())) {
+        if (currentUser != null && library.getAdmins() != null && library.getAdmins().containsKey(currentUser.getUid())) {
             binding.fabAddBook.setVisibility(View.VISIBLE);
-
-            binding.fabAddBook.setOnClickListener(v -> {
-                Intent intent = new Intent(this, AddBookActivity.class);
-                intent.putExtra("library", library);
-                startActivity(intent);
-            });
         }
 
-        // Set up listeners for the info and add book buttons
         binding.btnInfo.setOnClickListener(v -> {
             Intent intent = new Intent(this, LibraryInfoActivity.class);
             intent.putExtra("library", library);
             startActivity(intent);
         });
 
-        // Setup book list adapter
+        binding.fabAddBook.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddBookActivity.class);
+            intent.putExtra("library", library);
+            startActivity(intent);
+        });
+
         bookAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, bookList);
         binding.lvBooks.setAdapter(bookAdapter);
 
-        // Handle clicks on books in the list
         binding.lvBooks.setOnItemClickListener((parent, view, position, id) -> {
             Book selectedBook = bookList.get(position);
             Toast.makeText(this, selectedBook.getName() + " clicked", Toast.LENGTH_SHORT).show();
         });
 
-        // Setup search functionality
         setupBookSearch();
     }
 
-    /**
-     * Sets up the listeners for the book search bar and search view.
-     */
     private void setupBookSearch() {
         binding.bookSearchBar.setOnClickListener(v -> binding.bookSearchView.show());
         binding.bookSearchView.getEditText().setSingleLine();
 
         binding.bookSearchView.getEditText().setOnEditorActionListener((v, actionId, event) -> {
-            Log.d("LibraryViewActivity:", "search listener trigger: " + actionId);
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 String query = binding.bookSearchView.getText().toString().trim();
                 binding.bookSearchBar.setText(query);
@@ -102,28 +93,20 @@ public class LibraryViewActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Fetches book details from Firebase based on a search query.
-     * @param query The search term to filter book names.
-     */
     private void searchBooks(String query) {
         if (library.getBooks() == null || library.getBooks().isEmpty()) {
             Toast.makeText(this, "This library has no books.", Toast.LENGTH_SHORT).show();
-            return; // No books to fetch
+            return;
         }
 
-        bookList.clear(); // Clear previous search results
+        bookList.clear();
         bookAdapter.notifyDataSetChanged();
 
-        // Iterate through the list of book UIDs in the library
-        for (String bookUid : library.getBooks()) {
-
-            // Fetch the details for each book from the global /Books node
-            FBRef.refBooks.child(bookUid).addListenerForSingleValueEvent(new ValueEventListener() {
+        for (String bookId : library.getBooks().keySet()) {
+            FBRef.refBooks.child(bookId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot bookSnapshot) {
                     Book book = bookSnapshot.getValue(Book.class);
-                    // Check if the book exists and its name contains the search query
                     if (book != null && book.getName() != null && book.getName().toLowerCase().contains(query.toLowerCase())) {
                         bookList.add(book);
                         bookAdapter.notifyDataSetChanged();
@@ -132,7 +115,7 @@ public class LibraryViewActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(LibraryViewActivity.this, "Failed to load book details for UID: " + bookUid, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LibraryViewActivity.this, "Failed to load book details for ID: " + bookId, Toast.LENGTH_SHORT).show();
                 }
             });
         }

@@ -93,8 +93,8 @@ public class LibrariesFragment extends Fragment implements SearchHelper.OnLibrar
     public void onLibrarySelected(Library library) {
         User currentUser = FBRef.currentUser;
         if (currentUser != null &&
-                (library.getUsers() != null && library.getUsers().contains(currentUser.getUid())) ||
-                (library.getAdmins() != null && library.getAdmins().contains(currentUser.getUid()))
+                ((library.getUsers() != null && library.getUsers().containsKey(currentUser.getUid())) ||
+                (library.getAdmins() != null && library.getAdmins().containsKey(currentUser.getUid())))
         ) {
             // User is a member or an admin, go to the library view
             Intent intent = new Intent(requireContext(), LibraryViewActivity.class);

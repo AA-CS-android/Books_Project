@@ -11,7 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.hw.books_project.models.Library;
 import com.hw.books_project.models.User;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JoinLibraryActivity extends AppCompatActivity {
 
@@ -54,19 +55,15 @@ public class JoinLibraryActivity extends AppCompatActivity {
             return;
         }
 
-        // Get the current list of users, or create a new one
-        ArrayList<String> users = library.getUsers() != null ? new ArrayList<>(library.getUsers()) : new ArrayList<>();
-        
-        // Add the current user's UID to the list if not already present
-        if (!users.contains(currentUser.getUid())) {
-            users.add(currentUser.getUid());
+        Map<String, Boolean> users = library.getUsers() != null ? library.getUsers() : new HashMap<>();
+
+        if (!users.containsKey(currentUser.getUid())) {
+            users.put(currentUser.getUid(), true);
             library.setUsers(users);
 
-            // Update the library in Firebase
-            FBRef.refLibraries.child(library.getUid()).child("users").setValue(users)
+            FBRef.refLibraries.child(library.getLibraryId()).child("users").setValue(users)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(this, "Successfully joined " + library.getName(), Toast.LENGTH_SHORT).show();
-                        // Navigate to the library view screen
                         Intent intent = new Intent(this, LibraryViewActivity.class);
                         intent.putExtra("library", library);
                         startActivity(intent);
