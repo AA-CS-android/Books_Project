@@ -12,6 +12,6 @@ public class Loan {
     // book ID
     private String bookId;
     // loaner ID
-    private String uid;
+    private String userid;
 
 }

@@ -24,18 +24,6 @@
             android:hint="Author" />
 
         <EditText
-            android:id="@+id/etPublisher"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Publisher" />
-
-        <EditText
-            android:id="@+id/etReleaseDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Release Date (YYYY-MM-DD)" />
-
-        <EditText
             android:id="@+id/etLanguage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

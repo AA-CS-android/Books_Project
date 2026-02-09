@@ -55,7 +55,10 @@ public class SignUpActivity extends AppCompatActivity {
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
                             // Create and save user to Realtime Database
-                            User user = new User(firstName + " " + lastName, email, firebaseUser.getUid());
+                            User user = new User();
+                            user.setName(firstName + " " + lastName);
+                            user.setEmail(email);
+                            user.setUid(firebaseUser.getUid());
                             FBRef.refUsers.child(firebaseUser.getUid()).setValue(user).addOnCompleteListener(dbTask -> {
                                 pd.dismiss();
                                 if (dbTask.isSuccessful()) {

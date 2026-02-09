@@ -21,7 +21,7 @@ import java.util.Map;
 public class CreateLibraryActivity extends AppCompatActivity {
 
     private TextInputEditText etLibName;
-    private EditText etMaxDuration, etMaxCount, etCooldown;
+    private EditText etMaxDuration, etMaxCount;
     private Button btnCreateLibrary;
 
     @Override
@@ -35,7 +35,6 @@ public class CreateLibraryActivity extends AppCompatActivity {
         etLibName = findViewById(R.id.etLibName);
         etMaxDuration = findViewById(R.id.etMaxDuration);
         etMaxCount = findViewById(R.id.etMaxCount);
-        etCooldown = findViewById(R.id.etCooldown);
         btnCreateLibrary = findViewById(R.id.btnCreateLibrary);
 
         initIncDecButtons();
@@ -52,10 +51,6 @@ public class CreateLibraryActivity extends AppCompatActivity {
         setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountMin1), -1);
         setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountPls1), 1);
         setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountPls5), 5);
-        setupIncDecListeners(etCooldown, findViewById(R.id.btnCoolMin5), -5);
-        setupIncDecListeners(etCooldown, findViewById(R.id.btnCoolMin1), -1);
-        setupIncDecListeners(etCooldown, findViewById(R.id.btnCoolPls1), 1);
-        setupIncDecListeners(etCooldown, findViewById(R.id.btnCoolPls5), 5);
     }
 
     private void setupIncDecListeners(EditText et, Button btn, int val) {
@@ -77,10 +72,14 @@ public class CreateLibraryActivity extends AppCompatActivity {
             Toast.makeText(this, "Please enter a library name", Toast.LENGTH_SHORT).show();
             return;
         }
-
         int maxDuration = Integer.parseInt(etMaxDuration.getText().toString());
         if (maxDuration <= 0 || maxDuration > 365) {
             Toast.makeText(this, "Max loan duration must be between 1 and 365 days", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int maxCount = Integer.parseInt(etMaxCount.getText().toString());
+        if (maxCount <= 0 || maxCount > 10) {
+            Toast.makeText(this, "Max loan count must be between 1 and 10", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -91,7 +90,7 @@ public class CreateLibraryActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     Toast.makeText(CreateLibraryActivity.this, "A library with this name already exists.", Toast.LENGTH_SHORT).show();
                 } else {
-                    saveLibraryToDatabase(name, maxDuration);
+                    saveLibraryToDatabase(name, maxDuration, maxCount);
                 }
             }
 
@@ -102,9 +101,7 @@ public class CreateLibraryActivity extends AppCompatActivity {
         });
     }
 
-    private void saveLibraryToDatabase(String name, int maxDuration) {
-        int maxCount = Integer.parseInt(etMaxCount.getText().toString());
-        int cooldown = Integer.parseInt(etCooldown.getText().toString());
+    private void saveLibraryToDatabase(String name, int maxDuration, int maxCount) {
 
         String key = FBRef.refLibraries.push().getKey();
         if (key == null) {
@@ -112,20 +109,16 @@ public class CreateLibraryActivity extends AppCompatActivity {
             return;
         }
 
-        Map<String, Boolean> admins = new HashMap<>();
-        if (FBRef.currentUser != null) {
-            admins.put(FBRef.currentUser.getUid(), true);
-        }
+        String adminId = FBRef.currentUser.getUid();
 
-        Library newLibrary = new Library();
-        newLibrary.setLibraryId(key);
-        newLibrary.setName(name);
-        newLibrary.setMaxLoanDuration(maxDuration);
-        newLibrary.setMaxLoanCount(maxCount);
-        newLibrary.setReloanCooldown(cooldown);
-        newLibrary.setAdmins(admins);
+        Library library = new Library();
 
-        FBRef.refLibraries.child(key).setValue(newLibrary).addOnCompleteListener(task -> {
+        library.setLibraryId(key);
+        library.setName(name);
+        library.setMaxLoanDuration(maxDuration);
+        library.setMaxLoanCount(maxCount);
+
+        FBRef.refLibraries.child(name).setValue(library).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(CreateLibraryActivity.this, "Library created successfully!", Toast.LENGTH_SHORT).show();
                 finish();

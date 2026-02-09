@@ -16,4 +16,37 @@ public class User {
     private String email;
     // map loanID to return date
     private Map<String, Long> loans;
+
+    @Nullable
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(@Nullable String uid) {
+        this.uid = uid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Map<String, Long> getLoans() {
+        return loans;
+    }
+
+    public void setLoans(Map<String, Long> loans) {
+        this.loans = loans;
+    }
 }

@@ -114,6 +114,7 @@ public class AddBookManualFragment extends Fragment {
     }
 
     private void addBook() {
+        // create book
         if (library == null) {
             Toast.makeText(requireContext(), "Library data not found.", Toast.LENGTH_SHORT).show();
             return;
@@ -134,23 +135,23 @@ public class AddBookManualFragment extends Fragment {
         }
 
         List<String> genres = Arrays.asList(binding.etGenres.getText().toString().split(","));
+        String urlCoverImage = binding.etCoverImageUrl.getText().toString().trim();
 
-        Book newBook = new Book();
-        newBook.setBookId(bookId);
-        newBook.setName(name);
-        newBook.setAuthor(author);
-        newBook.setPublisher(binding.etPublisher.getText().toString().trim());
-        newBook.setRelease_date(binding.etReleaseDate.getText().toString().trim());
-        newBook.setLanguage(binding.etLanguage.getText().toString().trim());
-        newBook.setGenres(genres);
-        newBook.setISBN(binding.etISBN.getText().toString().trim());
-        newBook.setDanacode(binding.etDanacode.getText().toString().trim());
-        newBook.setCover_image_url(binding.etCoverImageUrl.getText().toString().trim());
-        newBook.setStatus("Available");
+        Book book = new Book();
+        book.setBookId(bookId);
+        book.setName(name);
+        book.setAuthor(author);
+        book.setCover_image_url(urlCoverImage);
+        book.setGenres(genres);
 
-        FBRef.refBooks.child(bookId).setValue(newBook).addOnSuccessListener(aVoid -> {
-            Map<String, Map<String, Boolean>> libraryBooks = library.getBooks() != null ? library.getBooks() : new HashMap<>();
-            String physicalBookId = FBRef.refLibraries.child(library.getLibraryId()).child("books").push().getKey();
+        FBRef.refBooks.child(bookId).setValue(book).addOnSuccessListener(aVoid -> {
+            // Add book to library
+            Map<String, Integer> books = (library.getBooks() != null) ? library.getBooks() : new HashMap<>();
+            // Increment book count if already exists
+            books.merge(bookId, 1, Integer::sum);
+
+
+            String physicalBookId = FBRef.refLibraries.child(library.getLibraryId()).child("books").set;
             if (physicalBookId == null) {
                 Toast.makeText(requireContext(), "Could not create physical book entry.", Toast.LENGTH_SHORT).show();
                 return;
