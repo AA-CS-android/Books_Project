@@ -58,12 +58,8 @@ public class LibraryInfoActivity extends AppCompatActivity {
     private void displayLibraryInfo() {
         tvLibraryName.setText(library.getName());
 
-        if (library.getAdmins() != null) {
-            fetchAndDisplayUserNames(new ArrayList<>(library.getAdmins().keySet()), lvAdmins);
-        }
-
         User currentUser = FBRef.currentUser;
-        if (currentUser != null && library.getAdmins() != null && library.getAdmins().containsKey(currentUser.getUid())) {
+        if (currentUser != null && library.getAdmin() != null && library.getAdmin().equals(currentUser.getUid())) {
             tvMembersLabel.setVisibility(View.VISIBLE);
             lvMembers.setVisibility(View.VISIBLE);
             if (library.getUsers() != null) {

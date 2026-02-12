@@ -1,6 +1,7 @@
 package com.hw.books_project.models;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -70,5 +71,11 @@ public class Library implements Serializable {
 
     public void setUsers(Map<String, Boolean> users) {
         this.users = users;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return name != null ? name : "Unnamed Library";
     }
 }

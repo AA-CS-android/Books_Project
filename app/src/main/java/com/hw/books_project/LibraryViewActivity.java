@@ -49,7 +49,7 @@ public class LibraryViewActivity extends AppCompatActivity {
         binding.toolbar.setTitle(library.getName());
 
         User currentUser = FBRef.currentUser;
-        if (currentUser != null && library.getAdmins() != null && library.getAdmins().containsKey(currentUser.getUid())) {
+        if (currentUser != null && library.getAdmin() != null && library.getAdmin().equals(currentUser.getUid())) {
             binding.fabAddBook.setVisibility(View.VISIBLE);
         }
 

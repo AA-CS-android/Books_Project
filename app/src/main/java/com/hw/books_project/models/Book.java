@@ -20,7 +20,6 @@ public class Book implements Serializable {
         this.cover_image_url = cover_image_url;
         this.genres = genres;
         this.author = author;
-        this.publisher = publisher;
         this.barcode = barcode;
     }
     public Book() {

@@ -15,9 +15,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.models.Library;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class CreateLibraryActivity extends AppCompatActivity {
 
     private TextInputEditText etLibName;
@@ -109,16 +106,17 @@ public class CreateLibraryActivity extends AppCompatActivity {
             return;
         }
 
-        String adminId = FBRef.currentUser.getUid();
-
         Library library = new Library();
 
         library.setLibraryId(key);
         library.setName(name);
+        if (FBRef.currentUser != null) {
+            library.setAdmin(FBRef.currentUser.getUid());
+        }
         library.setMaxLoanDuration(maxDuration);
         library.setMaxLoanCount(maxCount);
 
-        FBRef.refLibraries.child(name).setValue(library).addOnCompleteListener(task -> {
+        FBRef.refLibraries.child(key).setValue(library).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(CreateLibraryActivity.this, "Library created successfully!", Toast.LENGTH_SHORT).show();
                 finish();
