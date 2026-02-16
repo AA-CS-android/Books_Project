@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.hw.books_project.adapters.BookAdapter;
 import com.hw.books_project.databinding.ActivityLibraryViewBinding;
 import com.hw.books_project.models.Book;
 import com.hw.books_project.models.Library;
@@ -26,7 +26,7 @@ public class LibraryViewActivity extends AppCompatActivity {
     private ActivityLibraryViewBinding binding;
     private Library library;
     private ArrayList<Book> bookList = new ArrayList<>();
-    private ArrayAdapter<Book> bookAdapter;
+    private BookAdapter bookAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +65,7 @@ public class LibraryViewActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        bookAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, bookList);
+        bookAdapter = new BookAdapter(this, bookList);
         binding.lvBooks.setAdapter(bookAdapter);
 
         binding.lvBooks.setOnItemClickListener((parent, view, position, id) -> {

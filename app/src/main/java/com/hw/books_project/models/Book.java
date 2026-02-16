@@ -9,15 +9,15 @@ public class Book implements Serializable {
     @NonNull
     private String bookId = "Null";
     private String name;
-    private String cover_image_url;
+    private String coverImageUrl;
     private List<String> genres;
     private String author;
     private String barcode;
 
-    public Book(@NonNull String bookId, String name, String cover_image_url, List<String> genres, String author, String publisher, String barcode) {
+    public Book(@NonNull String bookId, String name, String coverImageUrl, List<String> genres, String author, String publisher, String barcode) {
         this.bookId = bookId;
         this.name = name;
-        this.cover_image_url = cover_image_url;
+        this.coverImageUrl = coverImageUrl;
         this.genres = genres;
         this.author = author;
         this.barcode = barcode;
@@ -42,12 +42,12 @@ public class Book implements Serializable {
         this.name = name;
     }
 
-    public String getCover_image_url() {
-        return cover_image_url;
+    public String getCoverImageUrl() {
+        return coverImageUrl;
     }
 
-    public void setCover_image_url(String cover_image_url) {
-        this.cover_image_url = cover_image_url;
+    public void setCoverImageUrl(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
     }
 
     public List<String> getGenres() {

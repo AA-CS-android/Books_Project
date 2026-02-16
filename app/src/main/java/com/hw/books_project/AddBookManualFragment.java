@@ -71,7 +71,7 @@ public class AddBookManualFragment extends Fragment {
         book.setBookId(bookId);
         book.setName(name);
         book.setAuthor(author);
-        book.setCover_image_url(urlCoverImage);
+        book.setCoverImageUrl(urlCoverImage);
         book.setGenres(genres);
 
         // Save the book to the database
