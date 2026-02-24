@@ -6,7 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NliQueryBuilder {
-    private final Map<String, String> queryParams = new HashMap<>();
+    private String urlString = "https://api.nli.org.il/openlibrary/search?",
+        query,
+        materialType,
+        outputFormat,
+        sortFiled,
+        countMode;
+
+    private Map<String, String> queryParams = new HashMap<>();
 
     public NliQueryBuilder outputFormat(String format)
     {

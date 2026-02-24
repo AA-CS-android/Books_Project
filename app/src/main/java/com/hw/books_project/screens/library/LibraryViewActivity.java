@@ -1,8 +1,7 @@
-package com.hw.books_project;
+package com.hw.books_project.screens.library;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
@@ -13,11 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.hw.books_project.screens.book.AddBookActivity;
 import com.hw.books_project.adapters.BookAdapter;
 import com.hw.books_project.databinding.ActivityLibraryViewBinding;
 import com.hw.books_project.models.Book;
 import com.hw.books_project.models.Library;
 import com.hw.books_project.models.User;
+import com.hw.books_project.utils.FBRef;
 
 import java.util.ArrayList;
 

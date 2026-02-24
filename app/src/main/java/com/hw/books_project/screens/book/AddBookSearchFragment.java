@@ -1,4 +1,4 @@
-package com.hw.books_project;
+package com.hw.books_project.screens.book;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -12,98 +12,39 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.hw.books_project.databinding.FragmentAddBookManualBinding;
-import com.hw.books_project.models.Book;
-import com.hw.books_project.models.Library;
+import com.hw.books_project.databinding.FragmentAddBookSearchBinding;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+public class AddBookSearchFragment extends Fragment {
 
-public class AddBookManualFragment extends Fragment {
-
-    private FragmentAddBookManualBinding binding;
-    private Library library;
+    private FragmentAddBookSearchBinding binding;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentAddBookManualBinding.inflate(inflater, container, false);
-        if (getArguments() != null) {
-            library = (Library) getArguments().getSerializable("library");
-        }
+        binding = FragmentAddBookSearchBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         setupFormatting();
-        binding.btnAddBook.setOnClickListener(v -> processBookCreation());
-    }
 
-    private void processBookCreation() {
-        if (library == null) {
-            Toast.makeText(requireContext(), "Library data not found.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        binding.btnSearch.setOnClickListener(v -> {
+            String name = binding.etBookName.getText().toString().trim();
+            String isbn = binding.etISBN.getText().toString().trim();
+            String danacode = binding.etDanacode.getText().toString().trim();
 
-        String name = binding.etBookName.getText().toString().trim();
-        String author = binding.etAuthor.getText().toString().trim();
+            if (name.isEmpty() && isbn.isEmpty() && danacode.isEmpty()) {
+                Toast.makeText(requireContext(), "Please enter at least one search term.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        if (name.isEmpty() || author.isEmpty()) {
-            Toast.makeText(requireContext(), "Please fill at least name and author", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Create the book object first
-        String bookId = FBRef.refBooks.push().getKey();
-        if (bookId == null) {
-            Toast.makeText(requireContext(), "Could not create book entry.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        List<String> genres = Arrays.asList(binding.etGenres.getText().toString().split(","));
-        String urlCoverImage = binding.etCoverImageUrl.getText().toString().trim();
-
-        Book book = new Book();
-        book.setBookId(bookId);
-        book.setName(name);
-        book.setAuthor(author);
-        book.setCoverImageUrl(urlCoverImage);
-        book.setGenres(genres);
-
-        // Save the book to the database
-        saveBookToDatabase(book);
-    }
-
-    private void saveBookToDatabase(Book book) {
-        FBRef.refBooks.child(book.getBookId()).setValue(book).addOnSuccessListener(aVoid -> {
-            // After successfully saving the book, add its reference to the library
-            addBookToLibrary(book.getBookId());
-        }).addOnFailureListener(e -> {
-            Toast.makeText(requireContext(), "Failed to create book: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            // TODO: Implement API call to search for book
+            String toastMessage = "Searching for: Name=" + name + ", ISBN=" + isbn + ", Danacode=" + danacode;
+            Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_LONG).show();
         });
-    }
-
-    private void addBookToLibrary(String bookId) {
-        Map<String, Integer> books = (library.getBooks() != null) ? library.getBooks() : new HashMap<>();
-        books.merge(bookId, 1, Integer::sum);
-
-        // Update the local library object before pushing to Firebase
-        library.setBooks(books);
-
-        FBRef.refLibraries.child(library.getLibraryId()).child("books").setValue(library.getBooks())
-                .addOnSuccessListener(aVoid1 -> {
-                    Toast.makeText(requireContext(), "Book added successfully!", Toast.LENGTH_SHORT).show();
-                    if (getActivity() != null) {
-                        getActivity().finish();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(requireContext(), "Failed to add book to library: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
     }
 
     private void setupFormatting() {

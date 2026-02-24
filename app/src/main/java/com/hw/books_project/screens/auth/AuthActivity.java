@@ -1,4 +1,4 @@
-package com.hw.books_project;
+package com.hw.books_project.screens.auth;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,8 +12,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.hw.books_project.screens.home.HomeScreenActivity;
 import com.hw.books_project.databinding.ActivityAuthBinding;
 import com.hw.books_project.models.User;
+import com.hw.books_project.utils.FBRef;
 
 public class AuthActivity extends AppCompatActivity {
 
@@ -32,7 +34,7 @@ public class AuthActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     FBRef.currentUser = snapshot.getValue(User.class);
-                    intent = new Intent(AuthActivity.this, HomeScreenAct.class);
+                    intent = new Intent(AuthActivity.this, HomeScreenActivity.class);
                     startActivity(intent);
                     finish();
                 }

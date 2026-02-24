@@ -1,4 +1,4 @@
-package com.hw.books_project;
+package com.hw.books_project.screens.book;
 
 import android.os.Bundle;
 
@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.hw.books_project.R;
 import com.hw.books_project.models.Library;
 
 public class AddBookActivity extends AppCompatActivity {

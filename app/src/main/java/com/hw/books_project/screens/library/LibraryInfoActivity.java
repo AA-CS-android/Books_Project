@@ -1,4 +1,4 @@
-package com.hw.books_project;
+package com.hw.books_project.screens.library;
 
 import android.os.Bundle;
 import android.view.View;
@@ -14,12 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.hw.books_project.R;
 import com.hw.books_project.models.Library;
 import com.hw.books_project.models.User;
+import com.hw.books_project.utils.FBRef;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class LibraryInfoActivity extends AppCompatActivity {
 

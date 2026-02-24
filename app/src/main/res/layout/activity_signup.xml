@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
-    tools:context=".SignUpActivity">
+    tools:context=".screens.auth.SignUpActivity">
 
     <EditText
         android:id="@+id/eTFirstName"

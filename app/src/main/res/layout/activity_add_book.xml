@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddBookActivity">
+    tools:context=".screens.book.AddBookActivity">
 
     <FrameLayout
         android:id="@+id/add_book_frame_container"

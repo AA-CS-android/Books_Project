@@ -1,4 +1,4 @@
-package com.hw.books_project;
+package com.hw.books_project.screens.auth;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -10,8 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.hw.books_project.screens.home.HomeScreenActivity;
 import com.hw.books_project.databinding.ActivitySignupBinding;
 import com.hw.books_project.models.User;
+import com.hw.books_project.utils.FBRef;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -71,7 +73,7 @@ public class SignUpActivity extends AppCompatActivity {
                                     editor.apply();
 
                                     Log.i("SignUpActivity", "User created and saved successfully.");
-                                    Intent intent = new Intent(SignUpActivity.this, HomeScreenAct.class);
+                                    Intent intent = new Intent(SignUpActivity.this, HomeScreenActivity.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     startActivity(intent);
                                     finish();
