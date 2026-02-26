@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.hw.books_project.R;
 import com.hw.books_project.screens.book.AddBookActivity;
 import com.hw.books_project.adapters.BookAdapter;
 import com.hw.books_project.databinding.ActivityLibraryViewBinding;
@@ -51,17 +52,23 @@ public class LibraryViewActivity extends AppCompatActivity {
 
         User currentUser = FBRef.currentUser;
         if (currentUser != null && library.getAdmin() != null && library.getAdmin().equals(currentUser.getUid())) {
-            binding.fabAddBook.setVisibility(View.VISIBLE);
+
+            binding.addBookMenuBtn.setVisibility(View.VISIBLE);
+            binding.addBookMenuBtn.setOnMenuItemClickListener(i -> {
+                if (R.drawable.api_icon == i){
+//                    Intent addBookIntent = new Intent(this, AddBookAPI.class);
+//                    addBookIntent.putExtra("library", library);
+//                    startActivity(addBookIntent);
+                } else if (R.drawable.archive_icon == i){
+                    Intent addBookIntent = new Intent(this, AddBookActivity.class);
+                    addBookIntent.putExtra("library", library);
+                    startActivity(addBookIntent);
+                }
+            });
         }
 
         binding.btnInfo.setOnClickListener(v -> {
             Intent intent = new Intent(this, LibraryInfoActivity.class);
-            intent.putExtra("library", library);
-            startActivity(intent);
-        });
-
-        binding.fabAddBook.setOnClickListener(v -> {
-            Intent intent = new Intent(this, AddBookActivity.class);
             intent.putExtra("library", library);
             startActivity(intent);
         });

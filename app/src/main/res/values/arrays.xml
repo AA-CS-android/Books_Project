@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="icons">
+        <item>@drawable/api_icon</item>
+        <item>@drawable/archive_icon</item>
+    </array>
+    <array name="colors">
+        <item>@color/blue</item>
+        <item>@color/green</item>
+    </array>
+</resources>
