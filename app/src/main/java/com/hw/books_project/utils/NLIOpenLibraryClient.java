@@ -143,6 +143,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -210,8 +211,10 @@ public class NLIOpenLibraryClient {
     }
 
     public static class QueryBuilder {
+        public final List<String> languages = Arrays.asList("eng", "heb");
+
         private final List<String> conditions = new ArrayList<>();
-        String materialType, sortField, outputFormat = "json";
+        String materialType = "books", sortField, outputFormat = "json";
         int itemsPerPage = 10;
 
         public QueryBuilder addCondition(String attr, String op, String val) {
@@ -219,8 +222,29 @@ public class NLIOpenLibraryClient {
             return this;
         }
 
-        public QueryBuilder setMaterialType(String t) { this.materialType = t; return this; }
+        public QueryBuilder addCondition(String val) {
+            conditions.add("any" + "," + "contains" + "," + val);
+            return this;
+        }
+
+        public QueryBuilder searchTitle(String val) {
+            conditions.add("title" + "," + "contains" + "," + val);
+            return this;
+        }
+
+        public QueryBuilder searchLanguage(String val) {
+            if (!languages.contains(val)) return this;
+            conditions.add("language" + "," + "exact" + "," + val);
+            return this;
+        }
+        public QueryBuilder searchISNB(String val) {
+            conditions.add("isbn" + "," + "exact" + "," + val);
+            return this;
+        }
+
+        //(no need for anything but books)        public QueryBuilder setMaterialType(String t) { this.materialType = t; return this; }
         public QueryBuilder setOutputFormat(String f) { this.outputFormat = f; return this; }
+        public QueryBuilder setSortField(String s) { this.outputFormat = s; return this; }
 
         public String buildQueryString() {
             // Joins conditions with NLI's specific delimiter
