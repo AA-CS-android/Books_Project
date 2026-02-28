@@ -19,6 +19,7 @@ import com.hw.books_project.databinding.ActivityLibraryViewBinding;
 import com.hw.books_project.models.Book;
 import com.hw.books_project.models.Library;
 import com.hw.books_project.models.User;
+import com.hw.books_project.screens.book.AddBookApiActivity;
 import com.hw.books_project.utils.FBRef;
 
 import java.util.ArrayList;
@@ -56,9 +57,9 @@ public class LibraryViewActivity extends AppCompatActivity {
             binding.addBookMenuBtn.setVisibility(View.VISIBLE);
             binding.addBookMenuBtn.setOnMenuItemClickListener(i -> {
                 if (R.drawable.api_icon == i){
-//                    Intent addBookIntent = new Intent(this, AddBookAPI.class);
-//                    addBookIntent.putExtra("library", library);
-//                    startActivity(addBookIntent);
+                    Intent addBookIntent = new Intent(this, AddBookApiActivity.class);
+                    addBookIntent.putExtra("library", library);
+                    startActivity(addBookIntent);
                 } else if (R.drawable.archive_icon == i){
                     Intent addBookIntent = new Intent(this, AddBookActivity.class);
                     addBookIntent.putExtra("library", library);
