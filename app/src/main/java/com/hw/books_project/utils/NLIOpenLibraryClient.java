@@ -2,6 +2,13 @@ package com.hw.books_project.utils;
 
 import android.os.Handler;
 import android.os.Looper;
+
+import com.hw.books_project.models.Book;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -26,7 +33,7 @@ public class NLIOpenLibraryClient {
 
     // Callback Interface
     public interface SearchCallback {
-        void onResult(String response);
+        void onResult(List<Book> books);
         void onError(Exception e);
     }
 
@@ -43,8 +50,14 @@ public class NLIOpenLibraryClient {
         executor.execute(() -> {
             try {
                 String fullUrl = buildFullUrl(qb);
-                String finalResult = doRequest(fullUrl);
-                callbackExecutor.execute(() -> callback.onResult(finalResult));
+                String response = doRequest(fullUrl);
+                List<Book> books;
+                if ("xml".equals(qb.outputFormat)) {
+                    books = BookResponseParser.parseXml(response);
+                } else {
+                    books = BookResponseParser.parseJson(response);
+                }
+                callbackExecutor.execute(() -> callback.onResult(books));
             } catch (Exception e) {
                 callbackExecutor.execute(() -> callback.onError(e));
             }
@@ -82,6 +95,57 @@ public class NLIOpenLibraryClient {
         sb.append("&output_format=").append(qb.outputFormat);
 
         return sb.toString();
+    }
+
+    public static class BookResponseParser {
+        public static List<Book> parseJson(String jsonResponse) throws JSONException {
+            final String KEY_TITLE = "http://purl.org/dc/elements/1.1/title";
+            final String KEY_CREATOR = "http://purl.org/dc/elements/1.1/creator";
+            final String KEY_ISBN = "http://purl.org/dc/elements/1.1/isbn";
+            final String KEY_THUMBNAIL = "http://purl.org/dc/elements/1.1/thumbnail";
+            final String KEY_SUBJECT = "http://purl.org/dc/elements/1.1/subject";
+            final String VALUE = "@value";
+
+            List<Book> books = new ArrayList<>();
+            JSONArray jsonArray = new JSONArray(jsonResponse);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject bookJson = jsonArray.getJSONObject(i);
+                Book book = new Book();
+
+                try {
+                    if (bookJson.has(KEY_TITLE)) {
+                        book.setName(bookJson.getJSONArray(KEY_TITLE).getJSONObject(0).getString(VALUE));
+                    }
+                    if (bookJson.has(KEY_CREATOR)) {
+                        book.setAuthor(bookJson.getJSONArray(KEY_CREATOR).getJSONObject(0).getString(VALUE));
+                    }
+                    if (bookJson.has(KEY_ISBN)) {
+                        book.setIsnb(bookJson.getJSONArray(KEY_ISBN).getJSONObject(0).getString(VALUE));
+                    }
+                    if (bookJson.has(KEY_THUMBNAIL)) {
+                        book.setCoverImageUrl(bookJson.getJSONArray(KEY_THUMBNAIL).getJSONObject(0).getString(VALUE));
+                    }
+                    if (bookJson.has(KEY_SUBJECT)) {
+                        book.setGenres(Arrays.asList(bookJson.getJSONArray(KEY_SUBJECT).getJSONObject(0).getString(VALUE).split(";")));
+                    }
+
+                    if (book.getName() != null && !book.getName().isEmpty()) {
+                        books.add(book);
+                    }
+
+                } catch (JSONException e) {
+                    // Could log this error if a book has a malformed entry, but continue parsing others
+                    System.err.println("Skipping a book due to parsing error: " + e.getMessage());
+                }
+            }
+            return books;
+        }
+
+        public static List<Book> parseXml(String xmlResponse) {
+            // TODO: Implement the logic to parse the XML and return a List<Book>
+            return new ArrayList<>();
+        }
     }
 
     public static class QueryBuilder {

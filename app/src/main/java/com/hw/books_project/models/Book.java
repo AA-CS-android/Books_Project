@@ -12,15 +12,17 @@ public class Book implements Serializable {
     private String coverImageUrl;
     private List<String> genres;
     private String author;
+    private String isnb;
     private String barcode;
 
-    public Book(@NonNull String bookId, String name, String coverImageUrl, List<String> genres, String author, String publisher, String barcode) {
+    public Book(@NonNull String bookId, String name, String coverImageUrl, List<String> genres, String author, String publisher, String barcode, String isbn) {
         this.bookId = bookId;
         this.name = name;
         this.coverImageUrl = coverImageUrl;
         this.genres = genres;
         this.author = author;
         this.barcode = barcode;
+        this.isnb = isbn;
     }
     public Book() {
     }
@@ -73,4 +75,8 @@ public class Book implements Serializable {
     public void setBarcode(String barcode) {
         this.barcode = barcode;
     }
+
+    public String getIsnb() {return isnb;}
+
+    public void setIsnb(String isnb) {this.isnb = isnb;}
 }

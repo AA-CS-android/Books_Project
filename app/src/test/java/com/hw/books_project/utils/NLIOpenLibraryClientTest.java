@@ -1,7 +1,18 @@
 package com.hw.books_project.utils;
 
+import com.google.gson.Gson;
+import com.hw.books_project.models.Book;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -9,7 +20,9 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
-public class  NLIOpenLibraryClientTest {
+import android.util.Xml;
+
+public class NLIOpenLibraryClientTest {
     // IMPORTANT: Replace "your_api_key" with a valid NLI API key for this test to pass.
     private NLIOpenLibraryClient client = new NLIOpenLibraryClient("8G1Zdce9ir7FxTm6OJ7VIBuzakEniAsm1xQjj6R1", Runnable::run);
     private NLIOpenLibraryClient.QueryBuilder qb = new NLIOpenLibraryClient.QueryBuilder();
@@ -23,6 +36,7 @@ public class  NLIOpenLibraryClientTest {
         qb.searchTitle("Harry Potter");
         qb.searchLanguage("eng");
         qb.addCondition("stone");
+        qb.setOutputFormat("json");
 
         System.out.println("------------------------");
         System.out.println("Executing query: " + qb.buildQueryString());
@@ -30,9 +44,9 @@ public class  NLIOpenLibraryClientTest {
 
         client.executeSearch(qb, new NLIOpenLibraryClient.SearchCallback() {
             @Override
-            public void onResult(String response) {
-                System.out.println("API Response: " + response);
-                assertFalse("API response should not be empty", response.isEmpty());
+            public void onResult(List<Book> books) {
+                System.out.println("API Response: " + books);
+                assertFalse("API response should not be empty", books.isEmpty());
                 latch.countDown();
             }
 
@@ -44,13 +58,31 @@ public class  NLIOpenLibraryClientTest {
         });
 
         try {
-            // Wait for max 10 seconds for the API call to complete.
-            if (!latch.await(10, TimeUnit.SECONDS)) {
+            // Wait for max 1000 seconds for the API call to complete.
+            if (!latch.await(1000, TimeUnit.SECONDS)) {
                 fail("API call timed out.");
             }
         } catch (InterruptedException e) {
             fail("Test was interrupted: " + e.getMessage());
         }
+    }
+
+    @Test
+    public void parse_json() throws IOException, JSONException {
+         final String KEY_TITLE = "http://purl.org/dc/elements/1.1/title";
+         final String KEY_CREATOR = "http://purl.org/dc/elements/1.1/creator";
+         final String KEY_ISBN = "http://purl.org/dc/elements/1.1/isbn";
+         final String KEY_THUMBNAIL = "http://purl.org/dc/elements/1.1/thumbnail";
+         final String KEY_SUBJECT = "http://purl.org/dc/elements/1.1/subject";
+        String s = new String(Files.readAllBytes(Paths.get("C:\\Users\\Cyber_User\\AndroidStudioProjects\\Books_Project\\app\\src\\test\\java\\com\\hw\\books_project\\utils\\response.json")), StandardCharsets.UTF_8);
+        JSONArray jsonArray = new JSONArray(s);
+        JSONObject jo = new JSONObject(s);
+        Gson g = new Gson();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            String title = jsonObject.getString(KEY_TITLE);
+        }
+        System.out.println(s);
     }
 
     @Test
