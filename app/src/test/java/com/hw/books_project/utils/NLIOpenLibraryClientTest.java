@@ -1,24 +1,56 @@
 package com.hw.books_project.utils;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class NLIOpenLibraryClientTest {
-//    private NLIOpenLibraryClient client = new NLIOpenLibraryClient("your_api_key");
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
+public class  NLIOpenLibraryClientTest {
+    // IMPORTANT: Replace "your_api_key" with a valid NLI API key for this test to pass.
+    private NLIOpenLibraryClient client = new NLIOpenLibraryClient("8G1Zdce9ir7FxTm6OJ7VIBuzakEniAsm1xQjj6R1", Runnable::run);
     private NLIOpenLibraryClient.QueryBuilder qb = new NLIOpenLibraryClient.QueryBuilder();
 
 
     @Test
     public void successful_search_with_valid_query() {
         // Verify that a valid QueryBuilder object results in a successful API call and the onResult callback is invoked with the expected response string on the main thread.
+        final CountDownLatch latch = new CountDownLatch(1);
 
         qb.searchTitle("Harry Potter");
         qb.searchLanguage("eng");
         qb.addCondition("stone");
 
         System.out.println("------------------------");
-        System.out.println(qb.buildQueryString());
+        System.out.println("Executing query: " + qb.buildQueryString());
         System.out.println("------------------------");
+
+        client.executeSearch(qb, new NLIOpenLibraryClient.SearchCallback() {
+            @Override
+            public void onResult(String response) {
+                System.out.println("API Response: " + response);
+                assertFalse("API response should not be empty", response.isEmpty());
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                fail("API call failed with an error: " + e.getMessage());
+                latch.countDown();
+            }
+        });
+
+        try {
+            // Wait for max 10 seconds for the API call to complete.
+            if (!latch.await(10, TimeUnit.SECONDS)) {
+                fail("API call timed out.");
+            }
+        } catch (InterruptedException e) {
+            fail("Test was interrupted: " + e.getMessage());
+        }
     }
 
     @Test
