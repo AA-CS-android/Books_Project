@@ -93,6 +93,7 @@ public class NLIOpenLibraryClient {
         if (qb.sortField != null) sb.append("&sort_field=").append(qb.sortField);
         sb.append("&items_per_page=").append(qb.itemsPerPage);
         sb.append("&output_format=").append(qb.outputFormat);
+        sb.append("&result_page=").append(qb.pageNumber);
 
         return sb.toString();
     }
@@ -150,10 +151,9 @@ public class NLIOpenLibraryClient {
 
     public static class QueryBuilder {
         public final List<String> languages = Arrays.asList("eng", "heb");
-
         private final List<String> conditions = new ArrayList<>();
         String materialType = "books", sortField, outputFormat = "json";
-        int itemsPerPage = 10;
+        private int itemsPerPage = 10, pageNumber = 1;
 
         public QueryBuilder addCondition(String attr, String op, String val) {
             conditions.add(attr + "," + op + "," + val);
@@ -197,6 +197,11 @@ public class NLIOpenLibraryClient {
                 }
                 return sb.toString();
             }
+        }
+        public void nextPage(){pageNumber += 1;}
+        public void previousPage(){
+            if(! (pageNumber == 1))
+                pageNumber -= 1;
         }
     }
 }

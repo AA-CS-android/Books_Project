@@ -33,11 +33,11 @@ public class NLIOpenLibraryClientTest {
         // Verify that a valid QueryBuilder object results in a successful API call and the onResult callback is invoked with the expected response string on the main thread.
         final CountDownLatch latch = new CountDownLatch(1);
 
-        qb.searchTitle("Harry Potter");
-        qb.searchLanguage("eng");
-        qb.addCondition("stone");
+        qb.searchTitle("הארי פוטר");
+        qb.searchLanguage("heb");
+        qb.addCondition("אבן החכמים");
         qb.setOutputFormat("json");
-
+        qb.nextPage();
         System.out.println("------------------------");
         System.out.println("Executing query: " + qb.buildQueryString());
         System.out.println("------------------------");
