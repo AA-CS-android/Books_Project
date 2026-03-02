@@ -11,6 +11,32 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Preview"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Preview Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
+
+            <include
+                android:id="@+id/preview_book_item"
+                layout="@layout/book_list_item" />
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="16dp"/>
+
         <EditText
             android:id="@+id/etBookName"
             android:layout_width="match_parent"
@@ -22,12 +48,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Author" />
-
-        <EditText
-            android:id="@+id/etLanguage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Language" />
 
         <EditText
             android:id="@+id/etGenres"
@@ -45,19 +65,6 @@
 
         <TextView
             android:id="@+id/tvFormattedISBN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <EditText
-            android:id="@+id/etDanacode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxLength="11"
-            android:inputType="number"
-            android:hint="Danacode" />
-
-        <TextView
-            android:id="@+id/tvFormattedDanacode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 

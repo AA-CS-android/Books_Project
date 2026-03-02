@@ -1,5 +1,6 @@
 package com.hw.books_project.screens.book;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,11 +13,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.hw.books_project.R;
 import com.hw.books_project.databinding.FragmentAddBookManualBinding;
 import com.hw.books_project.models.Book;
 import com.hw.books_project.models.Library;
+import com.hw.books_project.screens.library.LibraryViewActivity;
 import com.hw.books_project.utils.FBRef;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +31,7 @@ public class AddBookManualFragment extends Fragment {
 
     private FragmentAddBookManualBinding binding;
     private Library library;
+    private Book prefilledBook;
 
     @Nullable
     @Override
@@ -33,6 +39,7 @@ public class AddBookManualFragment extends Fragment {
         binding = FragmentAddBookManualBinding.inflate(inflater, container, false);
         if (getArguments() != null) {
             library = (Library) getArguments().getSerializable("library");
+            prefilledBook = (Book) getArguments().getSerializable("prefilledBook");
         }
         return binding.getRoot();
     }
@@ -41,7 +48,55 @@ public class AddBookManualFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setupFormatting();
+        setupLivePreview();
+        
+        if (prefilledBook != null) {
+            prefillData();
+        }
+        
         binding.btnAddBook.setOnClickListener(v -> processBookCreation());
+    }
+
+    private void prefillData() {
+        binding.etBookName.setText(prefilledBook.getName());
+        binding.etAuthor.setText(prefilledBook.getAuthor());
+        binding.etCoverImageUrl.setText(prefilledBook.getCoverImageUrl());
+        binding.etISBN.setText(prefilledBook.getIsnb());
+        if (prefilledBook.getGenres() != null) {
+            binding.etGenres.setText(String.join(", ", prefilledBook.getGenres()));
+        }
+        updatePreview();
+    }
+
+    private void setupLivePreview() {
+        TextWatcher previewWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updatePreview();
+            }
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        binding.etBookName.addTextChangedListener(previewWatcher);
+        binding.etAuthor.addTextChangedListener(previewWatcher);
+        binding.etGenres.addTextChangedListener(previewWatcher);
+        binding.etCoverImageUrl.addTextChangedListener(previewWatcher);
+    }
+
+    private void updatePreview() {
+        binding.previewBookItem.tvBookName.setText(binding.etBookName.getText().toString());
+        binding.previewBookItem.tvBookAuthor.setText(binding.etAuthor.getText().toString());
+        binding.previewBookItem.tvGenres.setText(binding.etGenres.getText().toString());
+
+        String imageUrl = binding.etCoverImageUrl.getText().toString().trim();
+        Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.library_book)
+                .error(R.drawable.library_book)
+                .into(binding.previewBookItem.ivBookCover);
     }
 
     private void processBookCreation() {
@@ -65,8 +120,18 @@ public class AddBookManualFragment extends Fragment {
             return;
         }
 
-        List<String> genres = Arrays.asList(binding.etGenres.getText().toString().split(","));
+        // Process genres: remove empty strings and duplicates
+        String[] genreParts = binding.etGenres.getText().toString().split(",");
+        List<String> genres = new ArrayList<>();
+        for (String part : genreParts) {
+            String trimmed = part.trim();
+            if (!trimmed.isEmpty() && !genres.contains(trimmed)) {
+                genres.add(trimmed);
+            }
+        }
+
         String urlCoverImage = binding.etCoverImageUrl.getText().toString().trim();
+        String isbn = binding.etISBN.getText().toString().trim();
 
         Book book = new Book();
         book.setBookId(bookId);
@@ -74,6 +139,7 @@ public class AddBookManualFragment extends Fragment {
         book.setAuthor(author);
         book.setCoverImageUrl(urlCoverImage);
         book.setGenres(genres);
+        book.setIsnb(isbn);
 
         // Save the book to the database
         saveBookToDatabase(book);
@@ -99,6 +165,10 @@ public class AddBookManualFragment extends Fragment {
                 .addOnSuccessListener(aVoid1 -> {
                     Toast.makeText(requireContext(), "Book added successfully!", Toast.LENGTH_SHORT).show();
                     if (getActivity() != null) {
+                        Intent intent = new Intent(requireContext(), LibraryViewActivity.class);
+                        intent.putExtra("library", library);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                         getActivity().finish();
                     }
                 })
@@ -115,19 +185,6 @@ public class AddBookManualFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 binding.tvFormattedISBN.setText(formatIsbn(s.toString()));
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
-        });
-
-        binding.etDanacode.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                binding.tvFormattedDanacode.setText(formatDanacode(s.toString()));
             }
 
             @Override
@@ -153,24 +210,6 @@ public class AddBookManualFragment extends Fragment {
             return formatted.toString();
         }
         return isbn;
-    }
-
-    private String formatDanacode(String danacode) {
-        if (danacode == null) return "";
-        danacode = danacode.replaceAll("[^\\d]", "");
-        long number;
-        try {
-            number = Long.parseLong(danacode);
-        } catch (NumberFormatException e) {
-            return danacode;
-        }
-
-        if (danacode.length() >= 3 && danacode.length() <= 12) {
-            String firstPart = String.valueOf(number).substring(0, Math.min(3, String.valueOf(number).length()));
-            String secondPart = String.valueOf(number).substring(3);
-            return firstPart + (secondPart.isEmpty() ? "" : "-" + secondPart);
-        }
-        return String.valueOf(number);
     }
 
     @Override

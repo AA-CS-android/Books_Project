@@ -34,15 +34,14 @@ public class AddBookSearchFragment extends Fragment {
         binding.btnSearch.setOnClickListener(v -> {
             String name = binding.etBookName.getText().toString().trim();
             String isbn = binding.etISBN.getText().toString().trim();
-            String danacode = binding.etDanacode.getText().toString().trim();
 
-            if (name.isEmpty() && isbn.isEmpty() && danacode.isEmpty()) {
+            if (name.isEmpty() && isbn.isEmpty()) {
                 Toast.makeText(requireContext(), "Please enter at least one search term.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // TODO: Implement API call to search for book
-            String toastMessage = "Searching for: Name=" + name + ", ISBN=" + isbn + ", Danacode=" + danacode;
+            String toastMessage = "Searching for: Name=" + name + ", ISBN=" + isbn;
             Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_LONG).show();
         });
     }
@@ -55,19 +54,6 @@ public class AddBookSearchFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 binding.tvFormattedISBN.setText(formatIsbn(s.toString()));
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) { }
-        });
-
-        binding.etDanacode.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                binding.tvFormattedDanacode.setText(formatDanacode(s.toString()));
             }
 
             @Override
@@ -93,24 +79,6 @@ public class AddBookSearchFragment extends Fragment {
             return formatted.toString();
         }
         return isbn;
-    }
-
-    private String formatDanacode(String danacode) {
-        if (danacode == null) return "";
-        danacode = danacode.replaceAll("[^\\d]", "");
-        long number;
-        try {
-            number = Long.parseLong(danacode);
-        } catch (NumberFormatException e) {
-            return danacode;
-        }
-
-        if (danacode.length() >= 3 && danacode.length() <= 12) {
-            String firstPart = String.valueOf(number).substring(0, Math.min(3, String.valueOf(number).length()));
-            String secondPart = String.valueOf(number).substring(3);
-            return firstPart + (secondPart.isEmpty() ? "" : "-" + secondPart);
-        }
-        return String.valueOf(number);
     }
 
     @Override

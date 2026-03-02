@@ -1,5 +1,6 @@
 package com.hw.books_project.screens.book;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -87,7 +88,10 @@ public class AddBookSearchApiFragment extends Fragment {
 
         lvResults.setOnItemClickListener((parent, view1, position, id) -> {
             Book selectedBook = bookList.get(position);
-            Toast.makeText(getContext(), selectedBook.getName() + " pressed", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getActivity(), AddBookActivity.class);
+            intent.putExtra("library", library);
+            intent.putExtra("prefilledBook", selectedBook);
+            startActivity(intent);
         });
     }
 

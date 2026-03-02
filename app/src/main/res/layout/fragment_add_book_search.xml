@@ -26,19 +26,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <EditText
-        android:id="@+id/etDanacode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:maxLength="11"
-        android:hint="Danacode" />
-
-    <TextView
-        android:id="@+id/tvFormattedDanacode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
     <Button
         android:id="@+id/btnSearch"
         android:layout_width="match_parent"
