@@ -79,4 +79,17 @@ public class Book implements Serializable {
     public String getIsnb() {return isnb;}
 
     public void setIsnb(String isnb) {this.isnb = isnb;}
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "bookId='" + bookId + '\'' +
+                ", name='" + name + '\'' +
+                ", coverImageUrl='" + coverImageUrl + '\'' +
+                ", genres=" + genres +
+                ", author='" + author + '\'' +
+                ", isnb='" + isnb + '\'' +
+                ", barcode='" + barcode + '\'' +
+                '}';
+    }
 }

@@ -1,27 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
     android:padding="16dp">
 
     <Button
         android:id="@+id/btnManageApiKey"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add/Edit API Key"/>
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:text="API Key" />
 
     <EditText
-        android:id="@+id/etSearchQuery"
+        android:id="@+id/etTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search for a book"/>
+        android:layout_below="@id/btnManageApiKey"
+        android:layout_marginTop="16dp"
+        android:hint="Title" />
+
+    <EditText
+        android:id="@+id/etAuthor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etTitle"
+        android:layout_marginTop="8dp"
+        android:hint="Author" />
+
+    <EditText
+        android:id="@+id/etIsbn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etAuthor"
+        android:layout_marginTop="8dp"
+        android:hint="ISBN" />
+
+    <RadioGroup
+        android:id="@+id/rgLanguage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etIsbn"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbLangAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="All" />
+
+        <RadioButton
+            android:id="@+id/rbLangHebrew"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hebrew" />
+
+        <RadioButton
+            android:id="@+id/rbLangEnglish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="English" />
+    </RadioGroup>
 
     <Button
         android:id="@+id/btnSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Search"/>
+        android:layout_below="@id/rgLanguage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Search" />
 
-</LinearLayout>
+    <ListView
+        android:id="@+id/lvResults"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/btnSearch"
+        android:layout_above="@+id/btnLoadMore"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnLoadMore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Load More Books"
+        android:visibility="gone" />
+
+</RelativeLayout>

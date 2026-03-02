@@ -2,6 +2,7 @@ package com.hw.books_project.utils;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.hw.books_project.models.Book;
 
@@ -77,7 +78,14 @@ public class NLIOpenLibraryClient {
             in.close();
             return response.toString();
         } else {
-            throw new Exception("Error: " + conn.getResponseCode());
+            Log.d("API client", "Error code:" + conn.getResponseCode());
+            if ("Forbidden".equals(conn.getResponseMessage()) || 403 == conn.getResponseCode()) {
+                throw new Exception("API Error: " + "Invalid API key");
+            }
+            else if ("Internal Server Error".equals(conn.getResponseMessage()) || 500 == conn.getResponseCode())
+                throw new Exception("API Error: " + "Invalid query or server error");
+            else
+                throw new Exception("API Error: " + conn.getResponseCode());
         }
     }
 
