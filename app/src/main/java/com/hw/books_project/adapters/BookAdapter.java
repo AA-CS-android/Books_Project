@@ -15,6 +15,7 @@ import com.hw.books_project.R;
 import com.hw.books_project.models.Book;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BookAdapter extends ArrayAdapter<Book> {
 
@@ -41,7 +42,14 @@ public class BookAdapter extends ArrayAdapter<Book> {
         if (currentBook != null) {
             tvBookName.setText(currentBook.getName());
             tvBookAuthor.setText(currentBook.getAuthor());
-            tvBookGenres.setText(String.join(", ",  currentBook.getGenres()));
+            
+            List<String> genres = currentBook.getGenres();
+            if (genres != null && !genres.isEmpty()) {
+                tvBookGenres.setText(String.join(", ", genres));
+            } else {
+                tvBookGenres.setText("");
+            }
+
             Glide.with(getContext())
                     .load(currentBook.getCoverImageUrl())
                     .placeholder(R.drawable.library_book)

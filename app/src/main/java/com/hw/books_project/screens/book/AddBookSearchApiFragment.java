@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -74,7 +75,13 @@ public class AddBookSearchApiFragment extends Fragment {
 
         btnManageApiKey.setOnClickListener(v -> ((AddBookApiActivity) getActivity()).showApiKeyScreen());
 
-        btnSearch.setOnClickListener(v -> performSearch(true));
+        btnSearch.setOnClickListener(v -> {
+            try{
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getContext().INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+            } catch (Exception ignored){};
+            performSearch(true);
+        });
 
         btnLoadMore.setOnClickListener(v -> performSearch(false));
 
@@ -126,7 +133,11 @@ public class AddBookSearchApiFragment extends Fragment {
                     Toast.makeText(getContext(), "No results found.", Toast.LENGTH_SHORT).show();
                     btnLoadMore.setVisibility(View.GONE);
                 } else {
-                    bookList.addAll(books);
+                    for (Book book : books) {
+                        if (!bookList.contains(book)) {
+                            bookList.add(book);
+                        }
+                    }
                     btnLoadMore.setVisibility(View.VISIBLE);
                 }
                 bookAdapter.notifyDataSetChanged();

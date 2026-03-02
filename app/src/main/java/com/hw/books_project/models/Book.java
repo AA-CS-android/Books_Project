@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class Book implements Serializable {
     @NonNull
@@ -79,6 +80,22 @@ public class Book implements Serializable {
     public String getIsnb() {return isnb;}
 
     public void setIsnb(String isnb) {this.isnb = isnb;}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return Objects.equals(name, book.name) &&
+                Objects.equals(author, book.author) &&
+                Objects.equals(isnb, book.isnb) &&
+                Objects.equals(coverImageUrl, book.coverImageUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, author, isnb, coverImageUrl);
+    }
 
     @Override
     public String toString() {
