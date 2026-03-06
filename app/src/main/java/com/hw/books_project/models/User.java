@@ -1,10 +1,7 @@
 package com.hw.books_project.models;
 
-import android.view.inputmethod.SelectGesture;
-
 import androidx.annotation.Nullable;
 
-import java.util.List;
 import java.util.Map;
 
 public class User {
@@ -16,6 +13,8 @@ public class User {
     private String email;
     // map loanID to return date
     private Map<String, Long> loans;
+    // map libraryID to true (index for joined libraries)
+    private Map<String, Boolean> libraries;
 
     @Nullable
     public String getUid() {
@@ -48,5 +47,13 @@ public class User {
 
     public void setLoans(Map<String, Long> loans) {
         this.loans = loans;
+    }
+
+    public Map<String, Boolean> getLibraries() {
+        return libraries;
+    }
+
+    public void setLibraries(Map<String, Boolean> libraries) {
+        this.libraries = libraries;
     }
 }

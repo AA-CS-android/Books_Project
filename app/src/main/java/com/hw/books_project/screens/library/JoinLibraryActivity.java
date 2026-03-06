@@ -57,21 +57,32 @@ public class JoinLibraryActivity extends AppCompatActivity {
             return;
         }
 
-        Map<String, Boolean> users = library.getUsers() != null ? library.getUsers() : new HashMap<>();
+        String uid = currentUser.getUid();
+        String libId = library.getLibraryId();
 
-        if (!users.containsKey(currentUser.getUid())) {
-            users.put(currentUser.getUid(), true);
-            library.setUsers(users);
+        // Use a multi-path update to keep both nodes in sync atomically
+        Map<String, Object> childUpdates = new HashMap<>();
+        
+        // 1. Add user to the library's user list
+        childUpdates.put("/Libraries/" + libId + "/users/" + uid, true);
+        
+        // 2. Add library to the user's library list (the index)
+        childUpdates.put("/UserLibraries/" + uid + "/" + libId, true);
 
-            FBRef.refLibraries.child(library.getLibraryId()).child("users").setValue(users)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Successfully joined " + library.getName(), Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(this, LibraryViewActivity.class);
-                        intent.putExtra("library", library);
-                        startActivity(intent);
-                        finish();
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to join library.", Toast.LENGTH_SHORT).show());
-        }
+        FBRef.refDB.getReference().updateChildren(childUpdates)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Successfully joined " + library.getName(), Toast.LENGTH_SHORT).show();
+                    
+                    // Update local library object for the next screen
+                    Map<String, Boolean> users = library.getUsers() != null ? library.getUsers() : new HashMap<>();
+                    users.put(uid, true);
+                    library.setUsers(users);
+                    
+                    Intent intent = new Intent(this, LibraryViewActivity.class);
+                    intent.putExtra("library", library);
+                    startActivity(intent);
+                    finish();
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to join library: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }

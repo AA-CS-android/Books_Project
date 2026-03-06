@@ -8,21 +8,29 @@ import android.widget.ListView;
 
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
-import com.hw.books_project.models.Library;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SearchHelper {
 
     /**
-     * A callback interface to notify when a library has been selected.
+     * A callback interface to notify when an item has been selected.
      */
-    public interface OnLibrarySelectedListener {
-        void onLibrarySelected(Library library);
+    public interface OnItemSelectedListener<T> {
+        void onItemSelected(T item);
     }
 
     /**
-     * Sets up the search functionality for a library list.
+     * An interface to provide the searchable text for an item.
+     */
+    public interface SearchableProvider<T> {
+        String getSearchableText(T item);
+    }
+
+    /**
+     * Sets up the search functionality for a generic list.
+     * It does not
      *
      * @param context            The application context.
      * @param searchBar          The Material SearchBar.
@@ -30,10 +38,14 @@ public class SearchHelper {
      * @param searchListView     The ListView inside the SearchView for suggestions.
      * @param mainAdapter        The ArrayAdapter for the main list.
      * @param suggestionsAdapter The ArrayAdapter for the suggestions list.
-     * @param fullLibraryList    The complete list of libraries to be searched.
-     * @param listener           The callback for when a library is selected.
+     * @param fullList           The complete list of items to be searched.
+     * @param searchableProvider A provider that returns the text to search in for each item.
+     * @param listener           The callback for when an item is selected.
      */
-    public static void setupSearch(Context context, SearchBar searchBar, SearchView searchView, ListView searchListView, ArrayAdapter<Library> mainAdapter, ArrayAdapter<Library> suggestionsAdapter, ArrayList<Library> fullLibraryList, OnLibrarySelectedListener listener) {
+    public static <T> void setupSearch(Context context, SearchBar searchBar, SearchView searchView, ListView searchListView, 
+                                     ArrayAdapter<T> mainAdapter, ArrayAdapter<T> suggestionsAdapter, 
+                                     List<T> fullList, SearchableProvider<T> searchableProvider, 
+                                     OnItemSelectedListener<T> listener) {
 
         // 1. Show the search view when the search bar is clicked
         searchBar.setOnClickListener(v -> searchView.show());
@@ -45,10 +57,12 @@ public class SearchHelper {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                ArrayList<Library> filteredSuggestions = new ArrayList<>();
-                for (Library library : fullLibraryList) {
-                    if (library.getName() != null && library.getName().toLowerCase().contains(s.toString().toLowerCase())) {
-                        filteredSuggestions.add(library);
+                ArrayList<T> filteredSuggestions = new ArrayList<>();
+                String query = s.toString().toLowerCase();
+                for (T item : fullList) {
+                    String searchableText = searchableProvider.getSearchableText(item);
+                    if (searchableText != null && searchableText.toLowerCase().contains(query)) {
+                        filteredSuggestions.add(item);
                     }
                 }
                 suggestionsAdapter.clear();
@@ -62,10 +76,10 @@ public class SearchHelper {
 
         // 3. Handle clicks on items in the suggestions list by calling the listener
         searchListView.setOnItemClickListener((parent, view, position, id) -> {
-            Library selectedLibrary = suggestionsAdapter.getItem(position);
-            if (selectedLibrary != null) {
+            T selectedItem = suggestionsAdapter.getItem(position);
+            if (selectedItem != null) {
                 searchView.hide();
-                listener.onLibrarySelected(selectedLibrary);
+                listener.onItemSelected(selectedItem);
             }
         });
 

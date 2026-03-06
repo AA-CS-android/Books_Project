@@ -2,6 +2,9 @@ package com.hw.books_project.screens.home;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,26 +15,29 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.screens.library.CreateLibraryActivity;
 import com.hw.books_project.screens.library.JoinLibraryActivity;
 import com.hw.books_project.screens.library.LibraryViewActivity;
 import com.hw.books_project.databinding.FragmentLibariesBinding;
 import com.hw.books_project.models.Library;
-import com.hw.books_project.models.User;
 import com.hw.books_project.utils.FBRef;
 import com.hw.books_project.utils.SearchHelper;
 
 import java.util.ArrayList;
 
-public class LibrariesFragment extends Fragment implements SearchHelper.OnLibrarySelectedListener {
+public class LibrariesFragment extends Fragment implements SearchHelper.OnItemSelectedListener<Library> {
 
     private FragmentLibariesBinding binding;
     private ArrayAdapter<Library> mainAdapter;
     private ArrayAdapter<Library> suggestionsAdapter;
-    private ArrayList<Library> libraryList = new ArrayList<>();
+    private final ArrayList<Library> joinedLibrariesList = new ArrayList<>();
+    private final ArrayList<Library> searchResults = new ArrayList<>();
 
     public LibrariesFragment() {
         // Required empty public constructor
@@ -51,14 +57,13 @@ public class LibrariesFragment extends Fragment implements SearchHelper.OnLibrar
     }
 
     private void init() {
-        mainAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, libraryList);
-        suggestionsAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
+        mainAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, joinedLibrariesList);
+        suggestionsAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, searchResults);
         binding.libsList.setAdapter(mainAdapter);
         binding.searchListView.setAdapter(suggestionsAdapter);
 
-        fetchLibraries();
-
-        SearchHelper.setupSearch(requireContext(), binding.libSearchBar, binding.searchView, binding.searchListView, mainAdapter, suggestionsAdapter, libraryList, this);
+        fetchJoinedLibraries();
+        setupServerSideSearch();
 
         binding.createLibBtn.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), CreateLibraryActivity.class);
@@ -68,48 +73,153 @@ public class LibrariesFragment extends Fragment implements SearchHelper.OnLibrar
         binding.libsList.setOnItemClickListener((parent, view, position, id) -> {
             Library selectedLibrary = mainAdapter.getItem(position);
             if (selectedLibrary != null) {
-                onLibrarySelected(selectedLibrary);
+                onItemSelected(selectedLibrary);
             }
         });
+
+        binding.searchListView.setOnItemClickListener((parent, view, position, id) -> {
+            Library selectedLibrary = suggestionsAdapter.getItem(position);
+            if (selectedLibrary != null) {
+                binding.searchView.hide();
+                onItemSelected(selectedLibrary);
+            }
+        });
+
+        binding.libSearchBar.setOnClickListener(v -> binding.searchView.show());
     }
 
-    private void fetchLibraries() {
-        FBRef.refLibraries.limitToFirst(10).addValueEventListener(new ValueEventListener() {
+    private void fetchJoinedLibraries() {
+        FirebaseUser firebaseUser = FBRef.refAuth.getCurrentUser();
+        if (firebaseUser == null) return;
+        String uid = firebaseUser.getUid();
+
+        // 1. Keep the SMALL index node synced for offline availability of the ID list
+        DatabaseReference userLibsRef = FBRef.refUserLibraries.child(uid);
+        userLibsRef.keepSynced(true);
+
+        // 2. Listen to the ID list. This will trigger from cache instantly.
+        userLibsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                libraryList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Library library = dataSnapshot.getValue(Library.class);
-                    if (library != null) {
-                        libraryList.add(library);
+                if (!snapshot.exists()) {
+                    joinedLibrariesList.clear();
+                    mainAdapter.notifyDataSetChanged();
+                    return;
+                }
+                
+                ArrayList<String> activeIds = new ArrayList<>();
+                for (DataSnapshot idSnapshot : snapshot.getChildren()) {
+                    String libId = idSnapshot.getKey();
+                    if (libId != null) {
+                        activeIds.add(libId);
+                        // Fetch details only if not already in list or to refresh
+                        fetchLibraryDetails(libId);
                     }
                 }
+                
+                // Cleanup removed libraries
+                joinedLibrariesList.removeIf(lib -> !activeIds.contains(lib.getLibraryId()));
                 mainAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(requireContext(), "Failed to load libraries.", Toast.LENGTH_SHORT).show();
+                if (getContext() != null)
+                    Toast.makeText(requireContext(), "Sync error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchLibraryDetails(String libId) {
+        // Use single value event to reduce traffic. 
+        // Firebase persistence will still serve the cached version immediately.
+        FBRef.refLibraries.child(libId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Library library = snapshot.getValue(Library.class);
+                if (library != null) {
+                    boolean found = false;
+                    for (int i = 0; i < joinedLibrariesList.size(); i++) {
+                        if (joinedLibrariesList.get(i).getLibraryId().equals(library.getLibraryId())) {
+                            joinedLibrariesList.set(i, library);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        joinedLibrariesList.add(library);
+                    }
+                    mainAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void setupServerSideSearch() {
+        binding.searchView.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String queryText = s.toString().trim();
+                if (queryText.length() >= 1) {
+                    performServerSearch(queryText);
+                } else {
+                    searchResults.clear();
+                    suggestionsAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void performServerSearch(String queryText) {
+        Query query = FBRef.refLibraries.orderByChild("name")
+                .startAt(queryText)
+                .endAt(queryText + "\uf8ff")
+                .limitToFirst(10);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                searchResults.clear();
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    Library library = data.getValue(Library.class);
+                    if (library != null) {
+                        searchResults.add(library);
+                    }
+                }
+                suggestionsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Search", "Search failed: " + error.getMessage());
             }
         });
     }
 
     @Override
-    public void onLibrarySelected(Library library) {
-        User currentUser = FBRef.currentUser;
-        if (currentUser != null &&
-                ((library.getUsers() != null && library.getUsers().containsKey(currentUser.getUid())) ||
-                (library.getAdmin() != null && library.getAdmin().equals(currentUser.getUid())))
-        ) {
-            // User is a member or an admin, go to the library view
-            Intent intent = new Intent(requireContext(), LibraryViewActivity.class);
-            intent.putExtra("library", library);
-            startActivity(intent);
-        } else {
-            // User is not a member, go to the join screen
-            Intent intent = new Intent(requireContext(), JoinLibraryActivity.class);
-            intent.putExtra("library", library);
-            startActivity(intent);
+    public void onItemSelected(Library library) {
+        FirebaseUser firebaseUser = FBRef.refAuth.getCurrentUser();
+        if (firebaseUser != null) {
+            String uid = firebaseUser.getUid();
+            if ((library.getUsers() != null && library.getUsers().containsKey(uid)) ||
+                (library.getAdmin() != null && library.getAdmin().equals(uid))) {
+                Intent intent = new Intent(requireContext(), LibraryViewActivity.class);
+                intent.putExtra("library", library);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(requireContext(), JoinLibraryActivity.class);
+                intent.putExtra("library", library);
+                startActivity(intent);
+            }
         }
     }
 

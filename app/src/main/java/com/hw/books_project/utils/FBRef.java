@@ -12,11 +12,11 @@ public class FBRef {
     public static DatabaseReference refBooks = refDB.getReference("Books");
     public static DatabaseReference refUsers = refDB.getReference("Users");
     public static DatabaseReference refLibraries = refDB.getReference("Libraries");
+    public static DatabaseReference refUserLibraries = refDB.getReference("UserLibraries");
 
     public static User currentUser;
 
     public static String firebaseAuthError(Exception exp) {
-        // ... (error handling code remains the same)
         return "An error occurred. Please try again later.";
     }
 }

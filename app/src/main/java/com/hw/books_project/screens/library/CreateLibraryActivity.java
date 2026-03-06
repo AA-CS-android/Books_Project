@@ -17,6 +17,9 @@ import com.hw.books_project.R;
 import com.hw.books_project.models.Library;
 import com.hw.books_project.utils.FBRef;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class CreateLibraryActivity extends AppCompatActivity {
 
     private TextInputEditText etLibName;
@@ -109,16 +112,24 @@ public class CreateLibraryActivity extends AppCompatActivity {
         }
 
         Library library = new Library();
-
         library.setLibraryId(key);
         library.setName(name);
+        String uid = null;
         if (FBRef.currentUser != null) {
-            library.setAdmin(FBRef.currentUser.getUid());
+            uid = FBRef.currentUser.getUid();
+            library.setAdmin(uid);
         }
         library.setMaxLoanDuration(maxDuration);
         library.setMaxLoanCount(maxCount);
 
-        FBRef.refLibraries.child(key).setValue(library).addOnCompleteListener(task -> {
+        // Multi-path update to add the library and update the UserLibraries index
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/Libraries/" + key, library);
+        if (uid != null) {
+            childUpdates.put("/UserLibraries/" + uid + "/" + key, true);
+        }
+
+        FBRef.refDB.getReference().updateChildren(childUpdates).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(CreateLibraryActivity.this, "Library created successfully!", Toast.LENGTH_SHORT).show();
                 finish();
