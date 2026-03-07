@@ -1,5 +1,6 @@
 package com.hw.books_project.screens.library;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -22,8 +23,12 @@ import com.hw.books_project.models.User;
 import com.hw.books_project.screens.book.AddBookApiActivity;
 import com.hw.books_project.utils.FBRef;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 public class LibraryViewActivity extends AppCompatActivity {
@@ -69,10 +74,32 @@ public class LibraryViewActivity extends AppCompatActivity {
 
         binding.lvBooks.setOnItemClickListener((parent, view, position, id) -> {
             Book selectedBook = bookList.get(position);
-            Toast.makeText(this, selectedBook.getName() + " clicked", Toast.LENGTH_SHORT).show();
+            showLoanDialog(selectedBook);
         });
 
         setupBookSearch();
+    }
+
+    private void showLoanDialog(Book book) {
+        // Calculate return date
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, library.getMaxLoanDuration());
+        Date returnDate = calendar.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String formattedReturnDate = sdf.format(returnDate);
+
+        String message = "Book name: " + book.getName() + "\n" +
+                         "Return date: " + formattedReturnDate;
+
+        new AlertDialog.Builder(this)
+                .setTitle("Loan book")
+                .setMessage(message)
+                .setPositiveButton("loan", (dialog, which) -> {
+                    // Placeholder for actual loan logic
+                    Toast.makeText(this, "loan successful", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("cancel", null)
+                .show();
     }
 
     private void initAdminFeatures() {
