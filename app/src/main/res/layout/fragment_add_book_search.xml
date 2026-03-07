@@ -21,15 +21,50 @@
         android:maxLength="13"
         android:hint="ISBN" />
 
+    <RadioGroup
+        android:id="@+id/rgSearchType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+        <RadioButton
+            android:id="@+id/rbSearchName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/rbSearchISBN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ISBN" />
+    </RadioGroup>
+
     <TextView
         android:id="@+id/tvFormattedISBN"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"/>
 
     <Button
         android:id="@+id/btnSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Search" />
+        android:text="Search Internal Database" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <ListView
+        android:id="@+id/lvInternalResults"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 </LinearLayout>
