@@ -23,12 +23,16 @@ import com.hw.books_project.screens.book.AddBookApiActivity;
 import com.hw.books_project.utils.FBRef;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class LibraryViewActivity extends AppCompatActivity {
 
     private ActivityLibraryViewBinding binding;
     private Library library;
-    private ArrayList<Book> bookList = new ArrayList<>();
+    private final ArrayList<Book> bookList = new ArrayList<>();
+    private final ArrayList<Book> fullBookList = new ArrayList<>();
+    private final Set<String> loadedBookIds = new HashSet<>();
     private BookAdapter bookAdapter;
 
     @Override
@@ -46,27 +50,13 @@ public class LibraryViewActivity extends AppCompatActivity {
         }
 
         init();
+        fetchFullLibraryDetails();
     }
 
     private void init() {
         binding.toolbar.setTitle(library.getName());
 
-        User currentUser = FBRef.currentUser;
-        if (currentUser != null && library.getAdmin() != null && library.getAdmin().equals(currentUser.getUid())) {
-
-            binding.addBookMenuBtn.setVisibility(View.VISIBLE);
-            binding.addBookMenuBtn.setOnMenuItemClickListener(i -> {
-                if (R.drawable.api_icon == i){
-                    Intent addBookIntent = new Intent(this, AddBookApiActivity.class);
-                    addBookIntent.putExtra("library", library);
-                    startActivity(addBookIntent);
-                } else if (R.drawable.archive_icon == i){
-                    Intent addBookIntent = new Intent(this, AddBookActivity.class);
-                    addBookIntent.putExtra("library", library);
-                    startActivity(addBookIntent);
-                }
-            });
-        }
+        initAdminFeatures();
 
         binding.btnInfo.setOnClickListener(v -> {
             Intent intent = new Intent(this, LibraryInfoActivity.class);
@@ -85,6 +75,88 @@ public class LibraryViewActivity extends AppCompatActivity {
         setupBookSearch();
     }
 
+    private void initAdminFeatures() {
+        User currentUser = FBRef.currentUser;
+        if (currentUser != null && library.getAdmin() != null && library.getAdmin().equals(currentUser.getUid())) {
+            binding.addBookMenuBtn.setVisibility(View.VISIBLE);
+            binding.addBookMenuBtn.setOnMenuItemClickListener(i -> {
+                if (R.drawable.api_icon == i){
+                    Intent addBookIntent = new Intent(this, AddBookApiActivity.class);
+                    addBookIntent.putExtra("library", library);
+                    startActivity(addBookIntent);
+                } else if (R.drawable.archive_icon == i){
+                    Intent addBookIntent = new Intent(this, AddBookActivity.class);
+                    addBookIntent.putExtra("library", library);
+                    startActivity(addBookIntent);
+                }
+            });
+        } else {
+            binding.addBookMenuBtn.setVisibility(View.GONE);
+        }
+    }
+
+    private void fetchFullLibraryDetails() {
+        FBRef.refLibraries.child(library.getLibraryId()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Library fullLibrary = snapshot.getValue(Library.class);
+                if (fullLibrary != null) {
+                    library = fullLibrary;
+                    binding.toolbar.setTitle(library.getName());
+                    initAdminFeatures();
+                    loadLibraryBooks();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void loadLibraryBooks() {
+        if (library.getBooks() == null) {
+            bookList.clear();
+            fullBookList.clear();
+            loadedBookIds.clear();
+            bookAdapter.notifyDataSetChanged();
+            return;
+        }
+
+        for (String bookId : library.getBooks().keySet()) {
+            if (loadedBookIds.contains(bookId)) continue;
+
+            loadedBookIds.add(bookId);
+            FBRef.refBooks.child(bookId).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Book book = snapshot.getValue(Book.class);
+                    if (book != null) {
+                        updateBookInLists(book);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {}
+            });
+        }
+    }
+
+    private synchronized void updateBookInLists(Book book) {
+        int index = -1;
+        for (int i = 0; i < fullBookList.size(); i++) {
+            if (fullBookList.get(i).getBookId().equals(book.getBookId())) {
+                index = i;
+                break;
+            }
+        }
+        if (index != -1) {
+            fullBookList.set(index, book);
+        } else {
+            fullBookList.add(book);
+        }
+        
+        // Refresh visible list with current search query (or empty for all)
+        searchBooks(binding.bookSearchBar.getText().toString());
+    }
+
     private void setupBookSearch() {
         binding.bookSearchBar.setOnClickListener(v -> binding.bookSearchView.show());
         binding.bookSearchView.getEditText().setSingleLine();
@@ -94,39 +166,20 @@ public class LibraryViewActivity extends AppCompatActivity {
                 String query = binding.bookSearchView.getText().toString().trim();
                 binding.bookSearchBar.setText(query);
                 binding.bookSearchView.hide();
-                if (!query.isEmpty()) {
-                    searchBooks(query);
-                }
+                searchBooks(query);
             }
             return false;
         });
     }
 
     private void searchBooks(String query) {
-        if (library.getBooks() == null || library.getBooks().isEmpty()) {
-            Toast.makeText(this, "This library has no books.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+        String lowerQuery = query.toLowerCase().trim();
         bookList.clear();
-        bookAdapter.notifyDataSetChanged();
-
-        for (String bookId : library.getBooks().keySet()) {
-            FBRef.refBooks.child(bookId).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot bookSnapshot) {
-                    Book book = bookSnapshot.getValue(Book.class);
-                    if (book != null && book.getName() != null && book.getName().toLowerCase().contains(query.toLowerCase())) {
-                        bookList.add(book);
-                        bookAdapter.notifyDataSetChanged();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(LibraryViewActivity.this, "Failed to load book details for ID: " + bookId, Toast.LENGTH_SHORT).show();
-                }
-            });
+        for (Book book : fullBookList) {
+            if (lowerQuery.isEmpty() || (book.getName() != null && book.getName().toLowerCase().contains(lowerQuery))) {
+                bookList.add(book);
+            }
         }
+        bookAdapter.notifyDataSetChanged();
     }
 }
