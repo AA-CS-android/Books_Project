@@ -3,7 +3,8 @@ package com.hw.books_project.utils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.hw.books_project.models.User;
+import com.google.firebase.database.ServerValue;
+import com.hw.books_project.objects.User;
 
 public class FBRef {
     public static FirebaseAuth refAuth = FirebaseAuth.getInstance();
@@ -13,6 +14,7 @@ public class FBRef {
     public static DatabaseReference refUsers = refDB.getReference("Users");
     public static DatabaseReference refLibraries = refDB.getReference("Libraries");
     public static DatabaseReference refUserLibraries = refDB.getReference("UserLibraries");
+    public static DatabaseReference refLoans = refDB.getReference("Loans");
 
     public static User currentUser;
 

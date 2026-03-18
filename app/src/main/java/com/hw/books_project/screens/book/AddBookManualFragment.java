@@ -16,13 +16,12 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.hw.books_project.R;
 import com.hw.books_project.databinding.FragmentAddBookManualBinding;
-import com.hw.books_project.models.Book;
-import com.hw.books_project.models.Library;
+import com.hw.books_project.objects.Book;
+import com.hw.books_project.objects.Library;
 import com.hw.books_project.screens.library.LibraryViewActivity;
 import com.hw.books_project.utils.FBRef;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

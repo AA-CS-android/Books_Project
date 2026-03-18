@@ -9,8 +9,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.hw.books_project.R;
-import com.hw.books_project.models.Library;
-import com.hw.books_project.models.User;
+import com.hw.books_project.objects.Library;
+import com.hw.books_project.objects.User;
 import com.hw.books_project.utils.FBRef;
 
 import java.util.HashMap;

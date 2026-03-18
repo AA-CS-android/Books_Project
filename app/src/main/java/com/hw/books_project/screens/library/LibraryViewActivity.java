@@ -17,11 +17,12 @@ import com.hw.books_project.R;
 import com.hw.books_project.screens.book.AddBookActivity;
 import com.hw.books_project.adapters.BookAdapter;
 import com.hw.books_project.databinding.ActivityLibraryViewBinding;
-import com.hw.books_project.models.Book;
-import com.hw.books_project.models.Library;
-import com.hw.books_project.models.User;
+import com.hw.books_project.objects.Book;
+import com.hw.books_project.objects.Library;
+import com.hw.books_project.objects.User;
 import com.hw.books_project.screens.book.AddBookApiActivity;
 import com.hw.books_project.utils.FBRef;
+import com.hw.books_project.utils.LoanUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -82,12 +83,7 @@ public class LibraryViewActivity extends AppCompatActivity {
 
     private void showLoanDialog(Book book) {
         // Calculate return date
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, library.getMaxLoanDuration());
-        Date returnDate = calendar.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        String formattedReturnDate = sdf.format(returnDate);
-
+        String formattedReturnDate = LoanUtils.getReturnDate(library.getMaxLoanDuration());
         String message = "Book name: " + book.getName() + "\n" +
                          "Return date: " + formattedReturnDate;
 
@@ -96,12 +92,26 @@ public class LibraryViewActivity extends AppCompatActivity {
                 .setMessage(message)
                 .setPositiveButton("loan", (dialog, which) -> {
                     // Placeholder for actual loan logic
-                    Toast.makeText(this, "loan successful", Toast.LENGTH_SHORT).show();
+                    loanBook(library, book, FBRef.currentUser);
+                    /// TODO: create an alarm/notification using alarm manager and notification (project requirements)
                 })
                 .setNegativeButton("cancel", null)
                 .show();
     }
 
+    private void loanBook(Library library, Book book, User user){
+        LoanUtils.loanBook(library, book, user, new LoanUtils.LoanCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(LibraryViewActivity.this, "loan successful", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Toast.makeText(LibraryViewActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     private void initAdminFeatures() {
         User currentUser = FBRef.currentUser;
         if (currentUser != null && library.getAdmin() != null && library.getAdmin().equals(currentUser.getUid())) {
@@ -152,7 +162,7 @@ public class LibraryViewActivity extends AppCompatActivity {
             if (loadedBookIds.contains(bookId)) continue;
 
             loadedBookIds.add(bookId);
-            FBRef.refBooks.child(bookId).addValueEventListener(new ValueEventListener() {
+            FBRef.refBooks.child(bookId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     Book book = snapshot.getValue(Book.class);

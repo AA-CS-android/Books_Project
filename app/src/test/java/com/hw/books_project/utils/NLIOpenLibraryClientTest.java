@@ -1,7 +1,7 @@
 package com.hw.books_project.utils;
 
 import com.google.gson.Gson;
-import com.hw.books_project.models.Book;
+import com.hw.books_project.objects.Book;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,13 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
-
-import android.util.Xml;
 
 public class NLIOpenLibraryClientTest {
     // IMPORTANT: Replace "your_api_key" with a valid NLI API key for this test to pass.

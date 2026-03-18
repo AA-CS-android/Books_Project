@@ -1,7 +1,6 @@
 package com.hw.books_project.utils;
 
-import com.google.firebase.database.DatabaseReference;
-import com.hw.books_project.models.Library;
+import com.hw.books_project.objects.Library;
 
 import java.util.HashMap;
 import java.util.Map;

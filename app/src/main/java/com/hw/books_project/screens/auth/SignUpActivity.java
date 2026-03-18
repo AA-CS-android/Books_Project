@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.hw.books_project.screens.home.HomeScreenActivity;
 import com.hw.books_project.databinding.ActivitySignupBinding;
-import com.hw.books_project.models.User;
+import com.hw.books_project.objects.User;
 import com.hw.books_project.utils.FBRef;
 
 public class SignUpActivity extends AppCompatActivity {

@@ -14,7 +14,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.screens.home.HomeScreenActivity;
 import com.hw.books_project.databinding.ActivityAuthBinding;
-import com.hw.books_project.models.User;
+import com.hw.books_project.objects.User;
 import com.hw.books_project.utils.FBRef;
 
 public class AuthActivity extends AppCompatActivity {

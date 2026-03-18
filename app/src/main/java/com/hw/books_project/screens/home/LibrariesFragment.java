@@ -25,7 +25,7 @@ import com.hw.books_project.screens.library.CreateLibraryActivity;
 import com.hw.books_project.screens.library.JoinLibraryActivity;
 import com.hw.books_project.screens.library.LibraryViewActivity;
 import com.hw.books_project.databinding.FragmentLibariesBinding;
-import com.hw.books_project.models.Library;
+import com.hw.books_project.objects.Library;
 import com.hw.books_project.utils.FBRef;
 import com.hw.books_project.utils.SearchHelper;
 

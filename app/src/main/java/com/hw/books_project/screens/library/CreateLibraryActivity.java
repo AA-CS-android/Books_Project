@@ -14,7 +14,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.R;
-import com.hw.books_project.models.Library;
+import com.hw.books_project.objects.Library;
 import com.hw.books_project.utils.FBRef;
 
 import java.util.HashMap;

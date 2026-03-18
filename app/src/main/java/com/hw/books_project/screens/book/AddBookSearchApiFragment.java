@@ -19,8 +19,8 @@ import androidx.fragment.app.Fragment;
 
 import com.hw.books_project.R;
 import com.hw.books_project.adapters.BookAdapter;
-import com.hw.books_project.models.Book;
-import com.hw.books_project.models.Library;
+import com.hw.books_project.objects.Book;
+import com.hw.books_project.objects.Library;
 import com.hw.books_project.utils.ApiKeyDataStore;
 import com.hw.books_project.utils.NLIOpenLibraryClient;
 

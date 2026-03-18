@@ -1,4 +1,4 @@
-package com.hw.books_project.models;
+package com.hw.books_project.objects;
 
 import androidx.annotation.Nullable;
 
@@ -11,7 +11,7 @@ public class User {
     private String name;
     // email of user
     private String email;
-    // map loanID to return date
+    // map {libraryid}_{bookId}_{userId} to return date (loan date is saved in loans)
     private Map<String, Long> loans;
     // map libraryID to true (index for joined libraries)
     private Map<String, Boolean> libraries;
@@ -55,5 +55,11 @@ public class User {
 
     public void setLibraries(Map<String, Boolean> libraries) {
         this.libraries = libraries;
+    }
+    public void addLoan(Loan loan){
+        loans.put(loan.getLoanId(), loan.getLoanDate());
+    }
+    public void addLoanWithReturnDate(Loan loan, Long returnDate){
+        loans.put(loan.getLoanId(),returnDate);
     }
 }

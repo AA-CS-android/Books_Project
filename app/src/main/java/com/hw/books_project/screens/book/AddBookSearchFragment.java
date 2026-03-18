@@ -22,14 +22,12 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.adapters.BookAdapter;
 import com.hw.books_project.databinding.FragmentAddBookSearchBinding;
-import com.hw.books_project.models.Book;
-import com.hw.books_project.models.Library;
+import com.hw.books_project.objects.Book;
+import com.hw.books_project.objects.Library;
 import com.hw.books_project.utils.FBRef;
 import com.hw.books_project.utils.LibraryUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class AddBookSearchFragment extends Fragment {
 

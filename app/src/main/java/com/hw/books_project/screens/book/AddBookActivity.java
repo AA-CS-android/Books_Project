@@ -7,8 +7,8 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.hw.books_project.R;
-import com.hw.books_project.models.Book;
-import com.hw.books_project.models.Library;
+import com.hw.books_project.objects.Book;
+import com.hw.books_project.objects.Library;
 
 public class AddBookActivity extends AppCompatActivity {
 

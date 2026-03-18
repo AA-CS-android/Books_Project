@@ -1,4 +1,4 @@
-package com.hw.books_project.models;
+package com.hw.books_project.objects;
 
 import androidx.annotation.NonNull;
 

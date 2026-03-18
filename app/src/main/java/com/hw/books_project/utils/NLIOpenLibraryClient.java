@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.hw.books_project.models.Book;
+import com.hw.books_project.objects.Book;
 
 import org.json.JSONArray;
 import org.json.JSONException;

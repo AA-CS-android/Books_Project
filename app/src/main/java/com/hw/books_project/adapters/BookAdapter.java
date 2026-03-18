@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.bumptech.glide.Glide;
 import com.hw.books_project.R;
-import com.hw.books_project.models.Book;
+import com.hw.books_project.objects.Book;
 
 import java.util.ArrayList;
 import java.util.List;
