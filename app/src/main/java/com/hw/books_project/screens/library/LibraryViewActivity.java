@@ -91,16 +91,14 @@ public class LibraryViewActivity extends AppCompatActivity {
                 .setTitle("Loan book")
                 .setMessage(message)
                 .setPositiveButton("loan", (dialog, which) -> {
-                    // Placeholder for actual loan logic
                     loanBook(library, book, FBRef.currentUser);
-                    /// TODO: create an alarm/notification using alarm manager and notification (project requirements)
                 })
                 .setNegativeButton("cancel", null)
                 .show();
     }
 
     private void loanBook(Library library, Book book, User user){
-        LoanUtils.loanBook(library, book, user, new LoanUtils.LoanCallback() {
+        LoanUtils.loanBook(this, library, book, user, new LoanUtils.LoanCallback() {
             @Override
             public void onSuccess() {
                 Toast.makeText(LibraryViewActivity.this, "loan successful", Toast.LENGTH_SHORT).show();

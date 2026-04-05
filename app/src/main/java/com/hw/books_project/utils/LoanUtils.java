@@ -1,5 +1,10 @@
 package com.hw.books_project.utils;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -35,7 +40,7 @@ public class LoanUtils {
      * Attempts to loan a book from a library.
      * Uses a transaction to handle concurrent loan attempts safely.
      */
-    public static void loanBook(Library library, Book book, User user, LoanCallback callback) {
+    public static void loanBook(Context context, Library library, Book book, User user, LoanCallback callback) {
         if (library == null || book == null || user == null) {
             callback.onFailure("Invalid loan parameters");
             return;
@@ -43,63 +48,20 @@ public class LoanUtils {
         String loanId = library.getLibraryId() + "_" + book.getBookId() + "_" + user.getUid();
         Map<String, Object> updates = new HashMap<>();
 
+        long returnDateUnix = getReturnDateUNIX(library.getMaxLoanDuration());
+
         updates.put("Libraries/" + library.getLibraryId() + "/books/" + book.getBookId(), ServerValue.increment(-1));
         updates.put("Loans/" + loanId, new Loan(loanId, library.getLibraryId(), book.getBookId(), user.getUid(), getLoanDateUNIX()));
-        updates.put("Users/" + user.getUid() + "/loans/" + loanId, new Loan(loanId, library.getLibraryId(), book.getBookId(), user.getUid(), getReturnDateUNIX(library.getMaxLoanDuration())));
+        updates.put("Users/" + user.getUid() + "/loans/" + loanId, returnDateUnix);
 
         FBRef.refDB.getReference().updateChildren(updates, (error, ref) -> {
             if (error != null) {
                 callback.onFailure(error.getMessage());
             } else {
+                createLoanReminder(context, library, book, returnDateUnix);
                 callback.onSuccess();
             }
         });
-
-//
-//        DatabaseReference libBooksRef = FBRef.refLibraries.child(library.getLibraryId()).child("books").child(book.getBookId());
-//        libBooksRef.runTransaction(new Transaction.Handler() {
-//            @NonNull
-//            @Override
-//            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-//                Integer count = currentData.getValue(Integer.class);
-//
-//                if (count == null || count <= 0) {
-//                    // No copies available or book not found in this library's record
-//                    return Transaction.abort();
-//                }
-//
-//                // Decrease the number of available copies by 1
-//                currentData.setValue(count - 1);
-//
-//                return Transaction.success(currentData);
-//            }
-//
-//            @Override
-//            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
-//                /// TODO: revert changes (add the book back) if the loan creation did not work
-//                if (committed) {
-//                    // loan id contains: library id, book id, user id
-//                    String loanId = library.getLibraryId() + "_" + book.getBookId() + "_" + user.getUid();
-//                    Loan loan = new Loan(loanId, library.getLibraryId(), book.getBookId(), user.getUid(), getLoanDateUNIX());
-//                    FBRef.currentUser.addLoanWithReturnDate(loan, getReturnDateUNIX(library.getMaxLoanDuration()));
-//                    // new global loan record
-//                    FBRef.refLoans.child(loanId).setValue(loan);
-//                    // user loan record
-//                    FBRef.refUsers.child(FBRef.currentUser.getUid()).child("loans").child(loanId).setValue(getReturnDateUNIX(library.getMaxLoanDuration()));
-//                    callback.onSuccess();
-//                } else {
-//                    String message = (error != null) ? error.getMessage() : "No copies available.";
-//                    callback.onFailure(message);
-//                }
-//            }
-//        });
-    }
-
-    private static void createLoanRecord(Library library, Book book, User user, LoanCallback callback) {
-        // TODO: Implement the logic to create a new Loan object, 
-        // save it to the "Loans" branch, and update the User's "loans" branch.
-        // For now, we simulate success
-        callback.onSuccess();
     }
 
     public static String getReturnDate(Integer loanDuration) {
@@ -123,5 +85,33 @@ public class LoanUtils {
     }
     public static Long getReturnDateUNIX(int loanDuration) {
         return LocalDate.now().plusDays(loanDuration).atStartOfDay(ZoneOffset.UTC).toEpochSecond();
+    }
+
+    public static void createLoanReminder(Context context, Library library, Book book, Long returnDateUnix) {
+        Intent intent = new Intent(context, LoanReminderReceiver.class);
+        intent.putExtra(LoanReminderReceiver.EXTRA_BOOK_NAME, book.getName());
+        intent.putExtra(LoanReminderReceiver.EXTRA_LIBRARY_NAME, library.getName());
+
+        int requestCode = (book.getBookId() + library.getLibraryId()).hashCode();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context, 
+                requestCode, 
+                intent, 
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            // returnDateUnix is in seconds, AlarmManager needs milliseconds.
+            long triggerAtMillis = returnDateUnix * 1000;
+            
+            // Set alarm. For exact timing on newer Androids, you might need SCHEDULE_EXACT_ALARM permission
+            try {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+            } catch (SecurityException e) {
+                // Fallback or log if exact alarm permission is missing
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+            }
+        }
     }
 }
