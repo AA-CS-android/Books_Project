@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.hw.books_project.R;
 import com.hw.books_project.objects.Book;
-import com.hw.books_project.objects.Library;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,11 +30,13 @@ public class LoanedBookAdapter extends RecyclerView.Adapter<LoanedBookAdapter.Vi
         public Book book;
         public String libraryName;
         public Long returnDate;
+        public String libraryId;
 
-        public LoanedBookData(Book book, String libraryName, Long returnDate) {
+        public LoanedBookData(Book book, String libraryName, Long returnDate, String libraryId) {
             this.book = book;
             this.libraryName = libraryName;
             this.returnDate = returnDate;
+            this.libraryId = libraryId;
         }
     }
 

@@ -58,7 +58,34 @@ public class LoanUtils {
             if (error != null) {
                 callback.onFailure(error.getMessage());
             } else {
+                // Update local user object to reflect the new loan immediately
+                if (user.getLoans() == null) {
+                    user.setLoans(new HashMap<>());
+                }
+                user.getLoans().put(loanId, returnDateUnix);
+                
                 createLoanReminder(context, library, book, returnDateUnix);
+                callback.onSuccess();
+            }
+        });
+    }
+
+    /**
+     * Returns a loaned book.
+     */
+    public static void returnBook(Context context, String libraryId, String bookId, String userId, LoanCallback callback) {
+        String loanId = libraryId + "_" + bookId + "_" + userId;
+        Map<String, Object> updates = new HashMap<>();
+
+        updates.put("Libraries/" + libraryId + "/books/" + bookId, ServerValue.increment(1));
+        updates.put("Loans/" + loanId, null);
+        updates.put("Users/" + userId + "/loans/" + loanId, null);
+
+        FBRef.refDB.getReference().updateChildren(updates, (error, ref) -> {
+            if (error != null) {
+                callback.onFailure(error.getMessage());
+            } else {
+                cancelLoanReminder(context, libraryId, bookId);
                 callback.onSuccess();
             }
         });
@@ -112,6 +139,25 @@ public class LoanUtils {
                 // Fallback or log if exact alarm permission is missing
                 alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
             }
+        }
+    }
+
+    public static void cancelLoanReminder(Context context, String libraryId, String bookId) {
+        Intent intent = new Intent(context, LoanReminderReceiver.class);
+        int requestCode = (bookId + libraryId).hashCode();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        if (pendingIntent != null) {
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            if (alarmManager != null) {
+                alarmManager.cancel(pendingIntent);
+            }
+            pendingIntent.cancel();
         }
     }
 }

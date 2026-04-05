@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,7 @@ import com.hw.books_project.R;
 import com.hw.books_project.adapters.LoanedBookAdapter;
 import com.hw.books_project.objects.Book;
 import com.hw.books_project.utils.FBRef;
+import com.hw.books_project.utils.LoanUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -68,6 +70,8 @@ public class BooksFragment extends Fragment implements LoanedBookAdapter.OnBookC
         if (FBRef.currentUser == null || FBRef.currentUser.getLoans() == null || FBRef.currentUser.getLoans().isEmpty()) {
             tvEmptyMessage.setVisibility(View.VISIBLE);
             rvLoanedBooks.setVisibility(View.GONE);
+            loanDataList.clear();
+            adapter.notifyDataSetChanged();
             return;
         }
 
@@ -104,7 +108,7 @@ public class BooksFragment extends Fragment implements LoanedBookAdapter.OnBookC
                     public void onDataChange(@NonNull DataSnapshot bookSnapshot) {
                         Book book = bookSnapshot.getValue(Book.class);
                         if (book != null) {
-                            loanDataList.add(new LoanedBookAdapter.LoanedBookData(book, finalLibraryName, returnDate));
+                            loanDataList.add(new LoanedBookAdapter.LoanedBookData(book, finalLibraryName, returnDate, libraryId));
                             adapter.notifyDataSetChanged();
                         }
                     }
@@ -161,8 +165,23 @@ public class BooksFragment extends Fragment implements LoanedBookAdapter.OnBookC
                 .into(ivCover);
 
         btnReturn.setOnClickListener(v -> {
-            // TODO: Implement return logic
-            dialog.dismiss();
+            if (FBRef.currentUser == null) return;
+            
+            LoanUtils.returnBook(getContext(), data.libraryId, data.book.getBookId(), FBRef.currentUser.getUid(), new LoanUtils.LoanCallback() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(getContext(), "Book returned successfully", Toast.LENGTH_SHORT).show();
+                    // Remove from local user object map to keep sync before next fetch
+                    FBRef.currentUser.getLoans().remove(data.libraryId + "_" + data.book.getBookId() + "_" + FBRef.currentUser.getUid());
+                    loadUserLoans();
+                    dialog.dismiss();
+                }
+
+                @Override
+                public void onFailure(String message) {
+                    Toast.makeText(getContext(), "Failed to return book: " + message, Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         btnBack.setOnClickListener(v -> dialog.dismiss());
