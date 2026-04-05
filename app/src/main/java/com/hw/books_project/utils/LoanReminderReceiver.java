@@ -29,7 +29,7 @@ public class LoanReminderReceiver extends BroadcastReceiver {
         String libraryName = intent.getStringExtra(EXTRA_LIBRARY_NAME);
 
         createNotificationChannel(context);
-
+        /// TODO: make notification open the exact book in the book fragment
         Intent openAppIntent = new Intent(context, HomeScreenActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, openAppIntent, PendingIntent.FLAG_IMMUTABLE);
 

@@ -1,67 +1,172 @@
 package com.hw.books_project.screens.home;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.R;
+import com.hw.books_project.adapters.LoanedBookAdapter;
+import com.hw.books_project.objects.Book;
+import com.hw.books_project.utils.FBRef;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link BooksFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class BooksFragment extends Fragment {
-//
-//    // TODO: Rename parameter arguments, choose names that match
-//    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
-//
-//    // TODO: Rename and change types of parameters
-//    private String mParam1;
-//    private String mParam2;
-//
-//    public BooksFragment() {
-//        // Required empty public constructor
-//    }
-//
-//    /**
-//     * Use this factory method to create a new instance of
-//     * this fragment using the provided parameters.
-//     *
-//     * @param param1 Parameter 1.
-//     * @param param2 Parameter 2.
-//     * @return A new instance of fragment BooksFragment.
-//     */
-//    // TODO: Rename and change types and number of parameters
-//    public static BooksFragment newInstance(String param1, String param2) {
-//        BooksFragment fragment = new BooksFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-//
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
-//    }
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+public class BooksFragment extends Fragment implements LoanedBookAdapter.OnBookClickListener {
+
+    private RecyclerView rvLoanedBooks;
+    private TextView tvEmptyMessage;
+    private LoanedBookAdapter adapter;
+    private final List<LoanedBookAdapter.LoanedBookData> loanDataList = new ArrayList<>();
+
+    public BooksFragment() {
+        // Required empty public constructor
+    }
+
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_books, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_books, container, false);
+        rvLoanedBooks = view.findViewById(R.id.rvLoanedBooks);
+        tvEmptyMessage = view.findViewById(R.id.tvEmptyMessage);
+        
+        rvLoanedBooks.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new LoanedBookAdapter(getContext(), loanDataList, this);
+        rvLoanedBooks.setAdapter(adapter);
+        
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        loadUserLoans();
+    }
+
+    private void loadUserLoans() {
+        if (FBRef.currentUser == null || FBRef.currentUser.getLoans() == null || FBRef.currentUser.getLoans().isEmpty()) {
+            tvEmptyMessage.setVisibility(View.VISIBLE);
+            rvLoanedBooks.setVisibility(View.GONE);
+            return;
+        }
+
+        tvEmptyMessage.setVisibility(View.GONE);
+        rvLoanedBooks.setVisibility(View.VISIBLE);
+        loanDataList.clear();
+
+        Map<String, Long> userLoans = FBRef.currentUser.getLoans();
+        for (Map.Entry<String, Long> entry : userLoans.entrySet()) {
+            String loanId = entry.getKey();
+            Long returnDate = entry.getValue();
+
+            // loanId format: libraryId_bookId_userId
+            String[] parts = loanId.split("_");
+            if (parts.length >= 2) {
+                String libraryId = parts[0];
+                String bookId = parts[1];
+                fetchLoanDetails(libraryId, bookId, returnDate);
+            }
+        }
+    }
+
+    private void fetchLoanDetails(String libraryId, String bookId, Long returnDate) {
+        FBRef.refLibraries.child(libraryId).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot libSnapshot) {
+                String libraryName = libSnapshot.getValue(String.class);
+                if (libraryName == null) libraryName = "Unknown Library";
+
+                final String finalLibraryName = libraryName;
+
+                FBRef.refBooks.child(bookId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot bookSnapshot) {
+                        Book book = bookSnapshot.getValue(Book.class);
+                        if (book != null) {
+                            loanDataList.add(new LoanedBookAdapter.LoanedBookData(book, finalLibraryName, returnDate));
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    @Override
+    public void onBookClick(LoanedBookAdapter.LoanedBookData data) {
+        showReturnDialog(data);
+    }
+
+    private void showReturnDialog(LoanedBookAdapter.LoanedBookData data) {
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_return_book, null);
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setView(dialogView)
+                .create();
+
+        ImageView ivCover = dialogView.findViewById(R.id.ivBookCoverLarge);
+        TextView tvName = dialogView.findViewById(R.id.tvBookNameLarge);
+        TextView tvLibrary = dialogView.findViewById(R.id.tvLibraryNameLarge);
+        TextView tvReturnDate = dialogView.findViewById(R.id.tvReturnDateLarge);
+        TextView tvDaysRemaining = dialogView.findViewById(R.id.tvDaysRemainingLarge);
+        Button btnReturn = dialogView.findViewById(R.id.btnReturn);
+        Button btnBack = dialogView.findViewById(R.id.btnBack);
+
+        tvName.setText(data.book.getName());
+        tvLibrary.setText("Library: " + data.libraryName);
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        tvReturnDate.setText("Return Date: " + sdf.format(new Date(data.returnDate * 1000)));
+
+        long diffInMs = (data.returnDate * 1000) - System.currentTimeMillis();
+        long diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMs);
+        
+        if (diffInDays < 0) {
+            tvDaysRemaining.setText("(Overdue!)");
+            tvDaysRemaining.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+        } else {
+            tvDaysRemaining.setText("(" + diffInDays + " days remaining)");
+            tvDaysRemaining.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        }
+
+        Glide.with(this)
+                .load(data.book.getCoverImageUrl())
+                .placeholder(R.drawable.library_book)
+                .into(ivCover);
+
+        btnReturn.setOnClickListener(v -> {
+            // TODO: Implement return logic
+            dialog.dismiss();
+        });
+
+        btnBack.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 }
