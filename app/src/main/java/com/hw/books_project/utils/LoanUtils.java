@@ -45,6 +45,18 @@ public class LoanUtils {
             callback.onFailure("Invalid loan parameters");
             return;
         }
+
+        // Check if user already has a loan for this book (from any library)
+        if (user.getLoans() != null) {
+            String bookSuffix = "_" + book.getBookId() + "_" + user.getUid();
+            for (String existingLoanId : user.getLoans().keySet()) {
+                if (existingLoanId.endsWith(bookSuffix)) {
+                    callback.onFailure("You have already loaned this book.");
+                    return;
+                }
+            }
+        }
+
         String loanId = library.getLibraryId() + "_" + book.getBookId() + "_" + user.getUid();
         Map<String, Object> updates = new HashMap<>();
 
