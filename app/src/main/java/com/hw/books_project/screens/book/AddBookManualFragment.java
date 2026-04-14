@@ -14,17 +14,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.R;
 import com.hw.books_project.databinding.FragmentAddBookManualBinding;
 import com.hw.books_project.objects.Book;
 import com.hw.books_project.objects.Library;
 import com.hw.books_project.screens.library.LibraryViewActivity;
 import com.hw.books_project.utils.FBRef;
+import com.hw.books_project.utils.LibraryUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AddBookManualFragment extends Fragment {
 
@@ -48,12 +50,35 @@ public class AddBookManualFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         setupFormatting();
         setupLivePreview();
+        setupCopiesButtons();
         
         if (prefilledBook != null) {
             prefillData();
         }
         
         binding.btnAddBook.setOnClickListener(v -> processBookCreation());
+    }
+
+    private void setupCopiesButtons() {
+        binding.btnPlus.setOnClickListener(v -> {
+            String current = binding.etCopies.getText().toString().trim();
+            int val = 1;
+            try {
+                val = Integer.parseInt(current);
+            } catch (NumberFormatException ignored) {}
+            binding.etCopies.setText(String.valueOf(val + 1));
+        });
+
+        binding.btnMinus.setOnClickListener(v -> {
+            String current = binding.etCopies.getText().toString().trim();
+            int val = 1;
+            try {
+                val = Integer.parseInt(current);
+            } catch (NumberFormatException ignored) {}
+            if (val > 1) {
+                binding.etCopies.setText(String.valueOf(val - 1));
+            }
+        });
     }
 
     private void prefillData() {
@@ -106,74 +131,102 @@ public class AddBookManualFragment extends Fragment {
 
         String name = binding.etBookName.getText().toString().trim();
         String author = binding.etAuthor.getText().toString().trim();
+        String isbn = binding.etISBN.getText().toString().trim();
+        
+        String copiesStr = binding.etCopies.getText().toString().trim();
+        int copies = 1;
+        if (!copiesStr.isEmpty()) {
+            try {
+                copies = Integer.parseInt(copiesStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(requireContext(), "Invalid number of copies", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
 
         if (name.isEmpty() || author.isEmpty()) {
             Toast.makeText(requireContext(), "Please fill at least name and author", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Create the book object first
-        String bookId = FBRef.refBooks.push().getKey();
-        if (bookId == null) {
-            Toast.makeText(requireContext(), "Could not create book entry.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        final int finalCopies = copies;
 
-        // Process genres: remove empty strings and duplicates
+        if (prefilledBook != null && prefilledBook.getBookId() != null && !prefilledBook.getBookId().equals("Null")) {
+            saveBookAndAddToLibrary(prefilledBook, finalCopies);
+        } else if (!isbn.isEmpty()) {
+            FBRef.refBooks.orderByChild("isnb").equalTo(isbn).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        DataSnapshot match = snapshot.getChildren().iterator().next();
+                        Book existingBook = match.getValue(Book.class);
+                        if (existingBook != null) {
+                            saveBookAndAddToLibrary(existingBook, finalCopies);
+                            return;
+                        }
+                    }
+                    createNewBook(finalCopies);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    createNewBook(finalCopies);
+                }
+            });
+        } else {
+            createNewBook(finalCopies);
+        }
+    }
+
+    private void createNewBook(int copies) {
+        String bookId = FBRef.refBooks.push().getKey();
+        if (bookId == null) return;
+
         String[] genreParts = binding.etGenres.getText().toString().split(",");
         List<String> genres = new ArrayList<>();
         for (String part : genreParts) {
             String trimmed = part.trim();
-            if (!trimmed.isEmpty() && !genres.contains(trimmed)) {
-                genres.add(trimmed);
-            }
+            if (!trimmed.isEmpty()) genres.add(trimmed);
         }
-
-        String urlCoverImage = binding.etCoverImageUrl.getText().toString().trim();
-        String isbn = binding.etISBN.getText().toString().trim();
 
         Book book = new Book();
         book.setBookId(bookId);
-        book.setName(name);
-        book.setAuthor(author);
-        book.setCoverImageUrl(urlCoverImage);
+        book.setName(binding.etBookName.getText().toString().trim());
+        book.setAuthor(binding.etAuthor.getText().toString().trim());
+        book.setCoverImageUrl(binding.etCoverImageUrl.getText().toString().trim());
         book.setGenres(genres);
-        book.setIsnb(isbn);
+        book.setIsnb(binding.etISBN.getText().toString().trim());
 
-        // Save the book to the database
-        saveBookToDatabase(book);
+        saveBookAndAddToLibrary(book, copies);
     }
 
-    private void saveBookToDatabase(Book book) {
+    private void saveBookAndAddToLibrary(Book book, int copies) {
         FBRef.refBooks.child(book.getBookId()).setValue(book).addOnSuccessListener(aVoid -> {
-            // After successfully saving the book, add its reference to the library
-            addBookToLibrary(book.getBookId());
+            LibraryUtils.addBookToLibrary(library, book.getBookId(), copies, new LibraryUtils.OnLibraryUpdateListener() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(requireContext(), "Book added successfully!", Toast.LENGTH_SHORT).show();
+                    navigateBackToLibrary();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(requireContext(), "Failed to add book to library: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }).addOnFailureListener(e -> {
-            Toast.makeText(requireContext(), "Failed to create book: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Failed to save book: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         });
     }
 
-    private void addBookToLibrary(String bookId) {
-        Map<String, Integer> books = (library.getBooks() != null) ? library.getBooks() : new HashMap<>();
-        books.merge(bookId, 1, Integer::sum);
-
-        // Update the local library object before pushing to Firebase
-        library.setBooks(books);
-
-        FBRef.refLibraries.child(library.getLibraryId()).child("books").setValue(library.getBooks())
-                .addOnSuccessListener(aVoid1 -> {
-                    Toast.makeText(requireContext(), "Book added successfully!", Toast.LENGTH_SHORT).show();
-                    if (getActivity() != null) {
-                        Intent intent = new Intent(requireContext(), LibraryViewActivity.class);
-                        intent.putExtra("library", library);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        getActivity().finish();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(requireContext(), "Failed to add book to library: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+    private void navigateBackToLibrary() {
+        if (getActivity() != null) {
+            Intent intent = new Intent(requireContext(), LibraryViewActivity.class);
+            intent.putExtra("library", library);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            getActivity().finish();
+        }
     }
 
     private void setupFormatting() {

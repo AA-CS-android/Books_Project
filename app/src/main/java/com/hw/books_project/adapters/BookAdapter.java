@@ -16,11 +16,19 @@ import com.hw.books_project.objects.Book;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class BookAdapter extends ArrayAdapter<Book> {
 
+    private Map<String, Integer> bookCounts;
+
     public BookAdapter(@NonNull Context context, ArrayList<Book> books) {
         super(context, 0, books);
+    }
+
+    public void setBookCounts(Map<String, Integer> bookCounts) {
+        this.bookCounts = bookCounts;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -38,6 +46,7 @@ public class BookAdapter extends ArrayAdapter<Book> {
         TextView tvBookName = listItemView.findViewById(R.id.tvBookName);
         TextView tvBookAuthor = listItemView.findViewById(R.id.tvBookAuthor);
         TextView tvBookGenres = listItemView.findViewById(R.id.tvGenres);
+        TextView tvAvailableAmount = listItemView.findViewById(R.id.tvAvailableAmount);
 
         if (currentBook != null) {
             tvBookName.setText(currentBook.getName());
@@ -48,6 +57,13 @@ public class BookAdapter extends ArrayAdapter<Book> {
                 tvBookGenres.setText(String.join(", ", genres));
             } else {
                 tvBookGenres.setText("");
+            }
+
+            if (bookCounts != null && bookCounts.containsKey(currentBook.getBookId())) {
+                tvAvailableAmount.setText("Available: " + bookCounts.get(currentBook.getBookId()));
+                tvAvailableAmount.setVisibility(View.VISIBLE);
+            } else {
+                tvAvailableAmount.setVisibility(View.GONE);
             }
 
             Glide.with(getContext())

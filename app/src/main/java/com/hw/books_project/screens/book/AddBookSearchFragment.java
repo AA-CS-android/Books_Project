@@ -2,14 +2,17 @@ package com.hw.books_project.screens.book;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,6 +27,7 @@ import com.hw.books_project.adapters.BookAdapter;
 import com.hw.books_project.databinding.FragmentAddBookSearchBinding;
 import com.hw.books_project.objects.Book;
 import com.hw.books_project.objects.Library;
+import com.hw.books_project.screens.library.LibraryViewActivity;
 import com.hw.books_project.utils.FBRef;
 import com.hw.books_project.utils.LibraryUtils;
 
@@ -119,20 +123,35 @@ public class AddBookSearchFragment extends Fragment {
     }
 
     private void showAddConfirmationDialog(Book book) {
+        final EditText etCopies = new EditText(requireContext());
+        etCopies.setInputType(InputType.TYPE_CLASS_NUMBER);
+        etCopies.setHint("Number of copies");
+        etCopies.setText("1");
+
         new AlertDialog.Builder(requireContext())
                 .setTitle("Add Book")
-                .setMessage("Would you like to add '" + book.getName() + "' to your library?")
-                .setPositiveButton("Add", (dialog, which) -> addBookToLibrary(book))
+                .setMessage("Enter number of copies for '" + book.getName() + "':")
+                .setView(etCopies)
+                .setPositiveButton("Add", (dialog, which) -> {
+                    String copiesStr = etCopies.getText().toString().trim();
+                    int copies = 1;
+                    if (!copiesStr.isEmpty()) {
+                        try {
+                            copies = Integer.parseInt(copiesStr);
+                        } catch (NumberFormatException ignored) {}
+                    }
+                    addBookToLibrary(book, copies);
+                })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
-    private void addBookToLibrary(Book book) {
-        LibraryUtils.addBookToLibrary(library, book.getBookId(), new LibraryUtils.OnLibraryUpdateListener() {
+    private void addBookToLibrary(Book book, int copies) {
+        LibraryUtils.addBookToLibrary(library, book.getBookId(), copies, new LibraryUtils.OnLibraryUpdateListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(requireContext(), "Book added to library.", Toast.LENGTH_SHORT).show();
-
+                navigateBackToLibrary();
             }
 
             @Override
@@ -140,6 +159,16 @@ public class AddBookSearchFragment extends Fragment {
                 Toast.makeText(requireContext(), "Failed to add book to library: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void navigateBackToLibrary() {
+        if (getActivity() != null) {
+            Intent intent = new Intent(requireContext(), LibraryViewActivity.class);
+            intent.putExtra("library", library);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            getActivity().finish();
+        }
     }
 
     private void setupFormatting() {

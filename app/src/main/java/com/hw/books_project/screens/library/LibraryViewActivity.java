@@ -24,12 +24,8 @@ import com.hw.books_project.screens.book.AddBookApiActivity;
 import com.hw.books_project.utils.FBRef;
 import com.hw.books_project.utils.LoanUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 public class LibraryViewActivity extends AppCompatActivity {
@@ -82,16 +78,24 @@ public class LibraryViewActivity extends AppCompatActivity {
     }
 
     private void showLoanDialog(Book book) {
+        Integer count = library.getBooks() != null ? library.getBooks().get(book.getBookId()) : 0;
+        if (count == null) count = 0;
+
         // Calculate return date
         String formattedReturnDate = LoanUtils.getReturnDate(library.getMaxLoanDuration());
         String message = "Book name: " + book.getName() + "\n" +
+                         "Available copies: " + count + "\n" +
                          "Return date: " + formattedReturnDate;
 
         new AlertDialog.Builder(this)
                 .setTitle("Loan book")
                 .setMessage(message)
                 .setPositiveButton("loan", (dialog, which) -> {
-                    loanBook(library, book, FBRef.currentUser);
+                    if (library.getBooks() != null && library.getBooks().get(book.getBookId()) != null && library.getBooks().get(book.getBookId()) > 0) {
+                        loanBook(library, book, FBRef.currentUser);
+                    } else {
+                        Toast.makeText(this, "No copies available for loan.", Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .setNegativeButton("cancel", null)
                 .show();
@@ -139,6 +143,11 @@ public class LibraryViewActivity extends AppCompatActivity {
                     library = fullLibrary;
                     binding.toolbar.setTitle(library.getName());
                     initAdminFeatures();
+                    
+                    if (bookAdapter != null) {
+                        bookAdapter.setBookCounts(library.getBooks());
+                    }
+
                     loadLibraryBooks();
                 }
             }
