@@ -51,7 +51,7 @@ public class GeminiChatManager {
         List<Part> parts = new ArrayList<Part>();
         parts.add(new TextPart(systemPrompt));
         gemini = new GenerativeModel(
-                "gemini-2.0-flash",
+                "gemini-2.5-flash",
                 BuildConfig.Gemini_API_Key,
                 null,
                 null,

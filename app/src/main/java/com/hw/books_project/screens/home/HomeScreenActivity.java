@@ -20,7 +20,8 @@ public class HomeScreenActivity extends AppCompatActivity {
     private Button btnLogout;
     private Intent intent;
     private BottomNavigationView bottomNavigationView;
-    Fragment books, libraries;
+    Fragment books, libraries, ai;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +39,7 @@ public class HomeScreenActivity extends AppCompatActivity {
 
         books = new BooksFragment();
         libraries = new LibrariesFragment();
+        ai = new AiRecommendFragment();
 
         setCurrentFragment(libraries);
         bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -46,6 +48,8 @@ public class HomeScreenActivity extends AppCompatActivity {
                 setCurrentFragment(books);
             } else if (itemId == R.id.libraries) {
                 setCurrentFragment(libraries);
+            } else if (itemId == R.id.nav_ai) {
+                setCurrentFragment(ai);
             }
             return true;
         });
