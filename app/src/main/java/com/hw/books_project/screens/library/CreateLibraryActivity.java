@@ -1,6 +1,7 @@
 package com.hw.books_project.screens.library;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -60,10 +61,10 @@ public class CreateLibraryActivity extends AppCompatActivity {
             try {
                 int current = Integer.parseInt(et.getText().toString());
                 int newVal = current + val;
-                if (newVal < 0) newVal = 0;
+                if (newVal <= 0) newVal = 1;
                 et.setText(String.valueOf(newVal));
             } catch (NumberFormatException e) {
-                et.setText("0");
+                et.setText("1");
             }
         });
     }
@@ -75,12 +76,12 @@ public class CreateLibraryActivity extends AppCompatActivity {
             return;
         }
         int maxDuration = Integer.parseInt(etMaxDuration.getText().toString());
-        if (maxDuration <= 0 || maxDuration > 365) {
+        if (maxDuration < 0 || maxDuration > 365) {
             Toast.makeText(this, "Max loan duration must be between 1 and 365 days", Toast.LENGTH_SHORT).show();
             return;
         }
         int maxCount = Integer.parseInt(etMaxCount.getText().toString());
-        if (maxCount <= 0 || maxCount > 10) {
+        if (maxCount < 0 || maxCount > 10) {
             Toast.makeText(this, "Max loan count must be between 1 and 10", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -128,7 +129,7 @@ public class CreateLibraryActivity extends AppCompatActivity {
         if (uid != null) {
             childUpdates.put("/UserLibraries/" + uid + "/" + key, true);
         }
-
+        Log.i("CreateLibraryActivity", "Child Updates: " + childUpdates);
         FBRef.refDB.getReference().updateChildren(childUpdates).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(CreateLibraryActivity.this, "Library created successfully!", Toast.LENGTH_SHORT).show();

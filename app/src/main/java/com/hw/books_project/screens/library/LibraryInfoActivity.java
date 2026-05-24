@@ -24,8 +24,8 @@ import java.util.List;
 
 public class LibraryInfoActivity extends AppCompatActivity {
 
-    private TextView tvLibraryName, tvMembersLabel;
-    private ListView lvAdmins, lvMembers;
+    private TextView tvLibraryName, tvMembersLabel, tvAdminName;
+    private ListView lvMembers;
     private Library library;
     private Button backButton;
 
@@ -48,7 +48,7 @@ public class LibraryInfoActivity extends AppCompatActivity {
 
     private void init() {
         tvLibraryName = findViewById(R.id.tvLibraryName);
-        lvAdmins = findViewById(R.id.lvAdmins);
+        tvAdminName = findViewById(R.id.tvAdminName);
         tvMembersLabel = findViewById(R.id.tvMembersLabel);
         lvMembers = findViewById(R.id.lvMembers);
         backButton = findViewById(R.id.backButton);
@@ -58,6 +58,26 @@ public class LibraryInfoActivity extends AppCompatActivity {
 
     private void displayLibraryInfo() {
         tvLibraryName.setText(library.getName());
+
+        // Fetch and display admin name
+        if (library.getAdmin() != null) {
+            FBRef.refUsers.child(library.getAdmin()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        tvAdminName.setText(user.getName());
+                    } else {
+                        tvAdminName.setText("[Unknown Admin]");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    tvAdminName.setText("Error loading admin");
+                }
+            });
+        }
 
         User currentUser = FBRef.currentUser;
         if (currentUser != null && library.getAdmin() != null && library.getAdmin().equals(currentUser.getUid())) {
@@ -75,12 +95,19 @@ public class LibraryInfoActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
 
         for (String uid : uids) {
-            FBRef.refUsers.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            FBRef.refUsers.child(uid).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    User user = snapshot.getValue(User.class);
-                    if (user != null) {
-                        names.add(user.getName());
+                    // Note: This getValue(User.class) will fail if the user node 
+                    // in the DB contains old/corrupted loan objects instead of Longs.
+                    try {
+                        String user = snapshot.getValue(String.class);
+                        if (user != null) {
+                            names.add(user);
+                            adapter.notifyDataSetChanged();
+                        }
+                    } catch (Exception e) {
+                        names.add("Corrupted User Data (" + uid + ")");
                         adapter.notifyDataSetChanged();
                     }
                 }
