@@ -5,14 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +24,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.hw.books_project.R;
 import com.hw.books_project.adapters.BookAdapter;
 import com.hw.books_project.databinding.FragmentAddBookSearchBinding;
 import com.hw.books_project.objects.Book;
@@ -123,15 +125,20 @@ public class AddBookSearchFragment extends Fragment {
     }
 
     private void showAddConfirmationDialog(Book book) {
-        final EditText etCopies = new EditText(requireContext());
-        etCopies.setInputType(InputType.TYPE_CLASS_NUMBER);
-        etCopies.setHint("Number of copies");
-        etCopies.setText("1");
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_book_copies, null);
+        TextView tvMessage = dialogView.findViewById(R.id.tvDialogMessage);
+        EditText etCopies = dialogView.findViewById(R.id.etCopies);
+        
+        tvMessage.setText("Enter number of copies for '" + book.getName() + "':");
+
+        LibraryUtils.setupIncDecListeners(etCopies, dialogView.findViewById(R.id.btnMin5), -5);
+        LibraryUtils.setupIncDecListeners(etCopies, dialogView.findViewById(R.id.btnMin1), -1);
+        LibraryUtils.setupIncDecListeners(etCopies, dialogView.findViewById(R.id.btnPls1), 1);
+        LibraryUtils.setupIncDecListeners(etCopies, dialogView.findViewById(R.id.btnPls5), 5);
 
         new AlertDialog.Builder(requireContext())
                 .setTitle("Add Book")
-                .setMessage("Enter number of copies for '" + book.getName() + "':")
-                .setView(etCopies)
+                .setView(dialogView)
                 .setPositiveButton("Add", (dialog, which) -> {
                     String copiesStr = etCopies.getText().toString().trim();
                     int copies = 1;

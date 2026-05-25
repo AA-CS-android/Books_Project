@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,10 +15,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="Preview"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:textStyle="bold" />
 
         <!-- Preview Card -->
         <androidx.cardview.widget.CardView
@@ -34,8 +35,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@android:color/darker_gray"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:background="@android:color/darker_gray" />
 
         <EditText
             android:id="@+id/etBookName"
@@ -59,14 +60,14 @@
             android:id="@+id/etISBN"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="ISBN"
             android:inputType="number"
-            android:maxLength="13"
-            android:hint="ISBN" />
+            android:maxLength="13" />
 
         <TextView
             android:id="@+id/tvFormattedISBN"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/etCoverImageUrl"
@@ -74,42 +75,65 @@
             android:layout_height="wrap_content"
             android:hint="Cover Image URL" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Number of copies:"
+            android:textSize="16sp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center_vertical"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="0dp"
+            <Button
+                android:id="@+id/btnMin5"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Number of copies:"
-                android:textSize="16sp" />
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="-5" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btnMinus"
-                style="?attr/floatingActionButtonSmallStyle"
-                android:src="@drawable/outline_check_indeterminate_small_24"
-                android:layout_width="48dp"
-                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/btnMin1"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="-1" />
 
             <EditText
                 android:id="@+id/etCopies"
-                android:layout_width="60dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:inputType="number"
                 android:text="1" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btnPlus"
-                style="?attr/floatingActionButtonSmallStyle"
-                android:layout_width="48dp"
-                android:src="@drawable/add_48px"
-                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/btnPls1"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="+1" />
+
+            <Button
+                android:id="@+id/btnPls5"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                android:text="+5" />
 
         </LinearLayout>
 

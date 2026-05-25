@@ -1,5 +1,7 @@
 package com.hw.books_project.utils;
 
+import android.widget.Button;
+import android.widget.EditText;
 import com.hw.books_project.objects.Library;
 
 import java.util.HashMap;
@@ -36,5 +38,21 @@ public class LibraryUtils {
                 .addOnFailureListener(e -> {
                     if (listener != null) listener.onFailure(e);
                 });
+    }
+
+    /**
+     * Helper to set up increment/decrement buttons for an EditText.
+     */
+    public static void setupIncDecListeners(EditText et, Button btn, int val) {
+        btn.setOnClickListener(v -> {
+            try {
+                int current = Integer.parseInt(et.getText().toString());
+                int newVal = current + val;
+                if (newVal <= 0) newVal = 1;
+                et.setText(String.valueOf(newVal));
+            } catch (NumberFormatException e) {
+                et.setText("1");
+            }
+        });
     }
 }

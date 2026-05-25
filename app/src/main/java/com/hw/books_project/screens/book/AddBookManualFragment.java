@@ -60,25 +60,10 @@ public class AddBookManualFragment extends Fragment {
     }
 
     private void setupCopiesButtons() {
-        binding.btnPlus.setOnClickListener(v -> {
-            String current = binding.etCopies.getText().toString().trim();
-            int val = 1;
-            try {
-                val = Integer.parseInt(current);
-            } catch (NumberFormatException ignored) {}
-            binding.etCopies.setText(String.valueOf(val + 1));
-        });
-
-        binding.btnMinus.setOnClickListener(v -> {
-            String current = binding.etCopies.getText().toString().trim();
-            int val = 1;
-            try {
-                val = Integer.parseInt(current);
-            } catch (NumberFormatException ignored) {}
-            if (val > 1) {
-                binding.etCopies.setText(String.valueOf(val - 1));
-            }
-        });
+        LibraryUtils.setupIncDecListeners(binding.etCopies, binding.btnMin5, -5);
+        LibraryUtils.setupIncDecListeners(binding.etCopies, binding.btnMin1, -1);
+        LibraryUtils.setupIncDecListeners(binding.etCopies, binding.btnPls1, 1);
+        LibraryUtils.setupIncDecListeners(binding.etCopies, binding.btnPls5, 5);
     }
 
     private void prefillData() {

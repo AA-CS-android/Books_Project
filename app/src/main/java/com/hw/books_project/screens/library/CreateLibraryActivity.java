@@ -17,6 +17,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.hw.books_project.R;
 import com.hw.books_project.objects.Library;
 import com.hw.books_project.utils.FBRef;
+import com.hw.books_project.utils.LibraryUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,27 +47,14 @@ public class CreateLibraryActivity extends AppCompatActivity {
     }
 
     private void initIncDecButtons() {
-        setupIncDecListeners(etMaxDuration, findViewById(R.id.btnDurMin5), -5);
-        setupIncDecListeners(etMaxDuration, findViewById(R.id.btnDurMin1), -1);
-        setupIncDecListeners(etMaxDuration, findViewById(R.id.btnDurPls1), 1);
-        setupIncDecListeners(etMaxDuration, findViewById(R.id.btnDurPls5), 5);
-        setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountMin5), -5);
-        setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountMin1), -1);
-        setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountPls1), 1);
-        setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountPls5), 5);
-    }
-
-    private void setupIncDecListeners(EditText et, Button btn, int val) {
-        btn.setOnClickListener(v -> {
-            try {
-                int current = Integer.parseInt(et.getText().toString());
-                int newVal = current + val;
-                if (newVal <= 0) newVal = 1;
-                et.setText(String.valueOf(newVal));
-            } catch (NumberFormatException e) {
-                et.setText("1");
-            }
-        });
+        LibraryUtils.setupIncDecListeners(etMaxDuration, findViewById(R.id.btnDurMin5), -5);
+        LibraryUtils.setupIncDecListeners(etMaxDuration, findViewById(R.id.btnDurMin1), -1);
+        LibraryUtils.setupIncDecListeners(etMaxDuration, findViewById(R.id.btnDurPls1), 1);
+        LibraryUtils.setupIncDecListeners(etMaxDuration, findViewById(R.id.btnDurPls5), 5);
+        LibraryUtils.setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountMin5), -5);
+        LibraryUtils.setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountMin1), -1);
+        LibraryUtils.setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountPls1), 1);
+        LibraryUtils.setupIncDecListeners(etMaxCount, findViewById(R.id.btnCountPls5), 5);
     }
 
     private void createLibrary() {
