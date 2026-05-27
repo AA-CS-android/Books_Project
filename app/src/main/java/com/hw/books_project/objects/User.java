@@ -56,10 +56,5 @@ public class User {
     public void setLibraries(Map<String, Boolean> libraries) {
         this.libraries = libraries;
     }
-    public void addLoan(Loan loan){
-        loans.put(loan.getLoanId(), loan.getLoanDate());
-    }
-    public void addLoanWithReturnDate(Loan loan, Long returnDate){
-        loans.put(loan.getLoanId(),returnDate);
-    }
+
 }
