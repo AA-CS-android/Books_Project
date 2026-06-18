@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.hw.books_project.R;
 import com.hw.books_project.utils.ApiKeyDataStore;
 
+// REQUIREMENT: 9.5 Fragment
 public class ApiKeyFragment extends Fragment {
 
     private EditText etApiKey;

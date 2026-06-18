@@ -28,6 +28,7 @@ import com.hw.books_project.utils.LibraryUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+// REQUIREMENT: 9.5 Fragment
 public class AddBookManualFragment extends Fragment {
 
     private FragmentAddBookManualBinding binding;

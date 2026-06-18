@@ -66,6 +66,7 @@ public class LoanUtils {
         updates.put("Loans/" + loanId, new Loan(loanId, library.getLibraryId(), book.getBookId(), user.getUid(), getLoanDateUNIX()));
         updates.put("Users/" + user.getUid() + "/loans/" + loanId, returnDateUnix);
 
+        // REQUIREMENT: 9.15 Multi-User conflict resolution
         FBRef.refDB.getReference().updateChildren(updates, (error, ref) -> {
             if (error != null) {
                 callback.onFailure(error.getMessage());
@@ -139,6 +140,7 @@ public class LoanUtils {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
+        // REQUIREMENT: 6.13 AlarmManager
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
             // returnDateUnix is in seconds, AlarmManager needs milliseconds.

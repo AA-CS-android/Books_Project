@@ -31,6 +31,7 @@ import com.hw.books_project.utils.SearchHelper;
 
 import java.util.ArrayList;
 
+// REQUIREMENT: 9.5 Fragment
 public class LibrariesFragment extends Fragment implements SearchHelper.OnItemSelectedListener<Library> {
 
     private FragmentLibariesBinding binding;

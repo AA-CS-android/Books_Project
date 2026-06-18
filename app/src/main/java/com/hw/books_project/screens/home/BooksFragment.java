@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+// REQUIREMENT: 9.5 Fragment
 public class BooksFragment extends Fragment implements LoanedBookAdapter.OnBookClickListener {
 
     private RecyclerView rvLoanedBooks;

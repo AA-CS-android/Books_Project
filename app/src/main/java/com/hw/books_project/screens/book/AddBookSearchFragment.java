@@ -35,6 +35,7 @@ import com.hw.books_project.utils.LibraryUtils;
 
 import java.util.ArrayList;
 
+// REQUIREMENT: 9.5 Fragment
 public class AddBookSearchFragment extends Fragment {
 
     private FragmentAddBookSearchBinding binding;

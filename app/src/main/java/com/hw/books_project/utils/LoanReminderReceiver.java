@@ -17,6 +17,7 @@ import androidx.core.app.NotificationManagerCompat;
 import com.hw.books_project.R;
 import com.hw.books_project.screens.home.HomeScreenActivity;
 
+// REQUIREMENT: 10.1 BroadcastReceiver
 public class LoanReminderReceiver extends BroadcastReceiver {
     public static final String CHANNEL_ID = "loan_reminders";
     public static final String EXTRA_BOOK_NAME = "book_name";
@@ -57,6 +58,7 @@ public class LoanReminderReceiver extends BroadcastReceiver {
         notificationManager.notify(notificationId, builder.build());
     }
 
+    // REQUIREMENT: 6.13 Notification
     private void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String description = "Notifications for book return dates";

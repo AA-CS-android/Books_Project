@@ -21,6 +21,7 @@ import com.hw.books_project.R;
 import com.hw.books_project.utils.GeminiCallback;
 import com.hw.books_project.utils.GeminiManager;
 
+// REQUIREMENT: 9.5 Fragment
 public class AiRecommendFragment extends Fragment {
 
     private TextInputEditText etUserInput;

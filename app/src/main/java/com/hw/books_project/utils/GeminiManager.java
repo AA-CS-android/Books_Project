@@ -55,7 +55,7 @@ public class GeminiManager {
         }
         return instance;
     }
-
+    // REQUIREMENT: 6.12 AI
     /**
      * Sends a text prompt to the Gemini model and receives a text response.
      *

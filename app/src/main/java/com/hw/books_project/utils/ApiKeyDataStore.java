@@ -18,6 +18,7 @@ public class ApiKeyDataStore {
     }
 
     public void saveApiKey(String apiKey) {
+        // REQUIREMENT: 10.2 SharedPreferences
         sharedPreferences.edit().putString(API_KEY, apiKey).apply();
     }
 

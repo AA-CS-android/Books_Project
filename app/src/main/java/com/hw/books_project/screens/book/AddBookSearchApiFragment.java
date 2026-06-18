@@ -26,7 +26,7 @@ import com.hw.books_project.utils.NLIOpenLibraryClient;
 
 import java.util.ArrayList;
 import java.util.List;
-
+// REQUIREMENT: 9.5 Fragment
 public class AddBookSearchApiFragment extends Fragment {
 
     private Library library;
@@ -94,7 +94,7 @@ public class AddBookSearchApiFragment extends Fragment {
             startActivity(intent);
         });
     }
-
+    // REQUIREMENT: 6.2 external datasource
     private void performSearch(boolean isNewSearch) {
         String apiKey = apiKeyDataStore.getApiKey();
         if (apiKey == null || apiKey.isEmpty()) {

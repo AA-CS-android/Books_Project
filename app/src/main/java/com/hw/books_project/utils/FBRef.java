@@ -6,6 +6,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.hw.books_project.objects.User;
 
+// REQUIREMENT: 7 remote database
 public class FBRef {
     public static FirebaseAuth refAuth = FirebaseAuth.getInstance();
     public static FirebaseDatabase refDB = FirebaseDatabase.getInstance();
